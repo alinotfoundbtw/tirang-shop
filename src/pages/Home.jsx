@@ -68,7 +68,7 @@ export default function Home() {
           </div>
 
           {hero && (
-            <Link to={`/p/${hero.slug}`} className="hero-art" aria-label={hero.name} style={{ overflow: 'hidden' }}>
+            <Link to={`/p/${hero.slug}`} className="hero-art" aria-label={hero.name}>
               <Photo
                 src={hero.colors[hc].photos[0]}
                 alt={`${hero.name} — رنگ ${hero.colors[hc].name}`}
