@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.env
+.env.*
+.DS_Store
+*.log
+
+# Stray directory from a failed brace-expansion mkdir on Windows
+{src/

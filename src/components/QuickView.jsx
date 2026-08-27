@@ -1,0 +1,66 @@
+import { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { Photo } from './States';
+import { ColorPicker, SizePicker, useVariant } from './Buy';
+import { useShop } from '../lib/store';
+import { toman, fa } from '../lib/format';
+
+/** Buy from the grid without losing your place in it. */
+export default function QuickView({ product, onClose }) {
+  const { color, size, setSize, ci, pickColor, inStock } = useVariant(product);
+  const { dispatch, toast } = useShop();
+
+  useEffect(() => {
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    const key = (e) => e.key === 'Escape' && onClose();
+    window.addEventListener('keydown', key);
+    return () => {
+      document.body.style.overflow = prev;
+      window.removeEventListener('keydown', key);
+    };
+  }, [onClose]);
+
+  const add = () => {
+    dispatch({ type: 'add', id: product.id, color: color.name, size });
+    toast(`${product.name} — ${color.name}، ${size} به سبد اضافه شد`);
+    onClose();
+  };
+
+  return (
+    <div className="modal-scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
+      <div className="modal" role="dialog" aria-modal="true" aria-label={`نگاه سریع ${product.name}`}>
+        <div className="modal-grab" />
+        <div className="modal-grid">
+          <div style={{ aspectRatio: '3 / 4', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
+            <Photo src={color.photos[0]} alt={`${product.name} — ${color.name}`} eager tone={color.hex} sizes="(max-width: 700px) 100vw, 340px" />
+          </div>
+
+          <div className="stack" style={{ gap: 'var(--s4)' }}>
+            <div>
+              <h2 style={{ fontSize: 'var(--t-h2)' }}>{product.name}</h2>
+              <p className="muted" style={{ fontSize: 'var(--t-sm)' }}>{product.subtitle}</p>
+            </div>
+            <div className="price-now num">
+              {toman(product.price)}
+              {product.oldPrice && <s>{toman(product.oldPrice, { unit: false })}</s>}
+            </div>
+
+            <ColorPicker product={product} ci={ci} onPick={pickColor} />
+            <SizePicker product={product} color={color} size={size} onPick={setSize} />
+
+            <button className="btn btn-primary btn-block" onClick={add} disabled={!inStock}>
+              {inStock ? 'افزودن به سبد' : 'این ترکیب موجود نیست'}
+            </button>
+            <Link to={`/p/${product.slug}`} className="btn btn-ghost btn-block" onClick={onClose}>
+              دیدن جزئیات کامل
+            </Link>
+            <p className="muted" style={{ fontSize: 'var(--t-xs)', textAlign: 'center' }}>
+              تعویض سایز رایگان تا ۷ روز · ⭐ {fa(product.rating.toFixed(1).replace('.', '٫'))}
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

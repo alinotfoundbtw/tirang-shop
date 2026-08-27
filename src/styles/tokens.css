@@ -1,0 +1,68 @@
+/* ─────────────────────────────────────────────────────────────
+   TOKENS — the whole re-skin surface.
+   Six brand colors and two font families. Nothing below this file
+   hard-codes a color, so changing these six lines changes the shop.
+   ───────────────────────────────────────────────────────────── */
+
+:root {
+  /* Brand — instance «تیرنگ» (تیشرت). The clothes are the color;
+     the interface stays quiet and lets cobalt do the pointing. */
+  --ink: #14161b;      /* text, cool near-black        */
+  --paper: #f8f7f4;    /* page background, warm white  */
+  --blush: #eceae4;    /* cards, wells, dividers       */
+  --wine: #2b45e0;     /* primary: buttons, links      */
+  --cherry: #ff5a1f;   /* accent: sale, active, alerts */
+  --sand: #dfe3f7;     /* badges, quiet highlights     */
+
+  /* Derived — never edit by hand */
+  --ink-70: color-mix(in srgb, var(--ink) 70%, var(--paper));
+  --ink-45: color-mix(in srgb, var(--ink) 45%, var(--paper));
+  --line: color-mix(in srgb, var(--ink) 12%, var(--paper));
+  --line-strong: color-mix(in srgb, var(--ink) 22%, var(--paper));
+  --wine-soft: color-mix(in srgb, var(--wine) 10%, var(--paper));
+  --cherry-soft: color-mix(in srgb, var(--cherry) 14%, var(--paper));
+  --surface: #fff;
+
+  --ok: #1f7a4d;
+  --warn: #b0710f;
+  --danger: var(--cherry);
+
+  /* Type */
+  --font-display: 'Morabba', 'Vazirmatn', system-ui, sans-serif;
+  --font-body: 'Estedad', 'Vazirmatn', system-ui, sans-serif;
+
+  --t-hero: clamp(2.3rem, 9.5vw, 5rem);
+  --t-h1: clamp(1.6rem, 5.5vw, 2.4rem);
+  --t-h2: clamp(1.25rem, 4vw, 1.65rem);
+  --t-body: 0.975rem;
+  --t-sm: 0.85rem;
+  --t-xs: 0.75rem;
+
+  --s1: 4px;  --s2: 8px;  --s3: 12px; --s4: 16px;
+  --s5: 24px; --s6: 32px; --s7: 48px; --s8: 72px;
+
+  --r-sm: 8px;
+  --r-md: 14px;
+  --r-lg: 22px;
+  --r-full: 999px;
+
+  --shadow-1: 0 1px 2px rgba(20, 22, 27, 0.05), 0 4px 16px -8px rgba(20, 22, 27, 0.14);
+  --shadow-2: 0 14px 44px -20px rgba(20, 22, 27, 0.4);
+
+  --header-h: 60px;
+  --tabbar-h: 62px;
+  --max-w: 1240px;
+
+  --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+[data-theme='dark'] {
+  --ink: #f2f2f0;
+  --paper: #101116;
+  --blush: #1b1d24;
+  --wine: #7d90ff;
+  --cherry: #ff7f4d;
+  --sand: #2a2e3f;
+  --surface: #181a21;
+  --line: color-mix(in srgb, var(--ink) 14%, var(--paper));
+}

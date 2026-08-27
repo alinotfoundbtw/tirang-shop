@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="fa" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="theme-color" content="#2B45E0" />
+
+    <!-- ── SEO (defaults; every route overwrites these at runtime via src/lib/seo.js) ── -->
+    <title>تیرنگ | تیشرت پایه و طرح‌دار</title>
+    <meta
+      name="description"
+      content="تیشرت اورسایز، پایه، طرح‌دار و بچگانه با نخ پنبهٔ ایرانی. هر رنگ عکس خودش را دارد. تعویض سایز رایگان تا ۷ روز."
+    />
+    <link rel="canonical" href="https://example.com/" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="تیرنگ" />
+    <meta property="og:locale" content="fa_IR" />
+    <meta property="og:title" content="تیرنگ | تیشرت پایه و طرح‌دار" />
+    <meta property="og:description" content="تیشرت با نخ پنبهٔ ایرانی و رنگ‌های واقعی." />
+    <meta property="og:image" content="https://example.com/og.jpg" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="robots" content="index, follow, max-image-preview:large" />
+
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Store",
+        "name": "تیرنگ",
+        "description": "فروشگاه تیشرت",
+        "url": "https://example.com/",
+        "currenciesAccepted": "IRT",
+        "areaServed": "IR",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://example.com/products?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+
+    <!--
+      Type pairing: Morabba (display) + Estedad (body/UI).
+      These CDN paths can move. For production, self-host: put the woff2 files in
+      public/fonts/ and switch to the @font-face block in src/styles/fonts.css.
+    -->
+    <link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+    <link rel="preconnect" href="https://images.pexels.com" crossorigin />
+    <link rel="dns-prefetch" href="https://images.pexels.com" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/font-store/font-morabba@latest/dist/font-face.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/aminabedi68/Estedad@latest/dist/Estedad-FD/Estedad.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" />
+  </head>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/main.jsx"></script>
+    <noscript>برای دیدن فروشگاه، جاوااسکریپت را روشن کنید.</noscript>
+  </body>
+</html>
