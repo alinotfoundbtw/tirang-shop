@@ -49,11 +49,36 @@
   --shadow-1: 0 1px 2px rgba(20, 22, 27, 0.05), 0 4px 16px -8px rgba(20, 22, 27, 0.14);
   --shadow-2: 0 14px 44px -20px rgba(20, 22, 27, 0.4);
 
-  --header-h: 60px;
-  --tabbar-h: 62px;
+  --header-h: 56px;
+  --tabbar-h: 60px;
   --max-w: 1240px;
 
   --ease: cubic-bezier(0.22, 0.61, 0.36, 1);
+
+  /* ── Mobile foundations ──────────────────────────────────────
+     The page runs edge to edge under the notch (viewport-fit=cover),
+     so every fixed edge has to pay the inset back itself. */
+  --sat: env(safe-area-inset-top, 0px);
+  --sab: env(safe-area-inset-bottom, 0px);
+  --sal: env(safe-area-inset-left, 0px);
+  --sar: env(safe-area-inset-right, 0px);
+
+  /* Smallest thing a thumb can hit reliably. Nothing tappable goes under it. */
+  --tap: 44px;
+
+  /* Page gutter. Tight on phones so the products get the pixels, not the margin. */
+  --gutter: 14px;
+
+  /* Height of everything pinned to the bottom of a phone screen. */
+  --bottom-safe: calc(var(--tabbar-h) + var(--sab));
+}
+
+@media (min-width: 700px) {
+  :root { --gutter: var(--s4); --header-h: 60px; }
+}
+@media (min-width: 900px) {
+  /* No tab bar past this width, so nothing owes it space. */
+  :root { --gutter: var(--s5); --bottom-safe: 0px; }
 }
 
 [data-theme='dark'] {

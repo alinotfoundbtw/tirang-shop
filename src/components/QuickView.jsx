@@ -30,10 +30,13 @@ export default function QuickView({ product, onClose }) {
   return (
     <div className="modal-scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
       <div className="modal" role="dialog" aria-modal="true" aria-label={`نگاه سریع ${product.name}`}>
-        <div className="modal-grab" />
+        <div className="modal-head">
+          <div className="modal-grab" />
+          <button className="modal-close" onClick={onClose} aria-label="بستن">✕</button>
+        </div>
         <div className="modal-grid">
-          <div style={{ aspectRatio: '3 / 4', borderRadius: 'var(--r-md)', overflow: 'hidden' }}>
-            <Photo src={color.photos[0]} alt={`${product.name} — ${color.name}`} eager tone={color.hex} sizes="(max-width: 700px) 100vw, 340px" />
+          <div className="modal-photo">
+            <Photo src={color.photos[0]} alt={`${product.name} — ${color.name}`} eager tone={color.hex} sizes="(max-width: 699px) 100vw, 340px" />
           </div>
 
           <div className="stack" style={{ gap: 'var(--s4)' }}>

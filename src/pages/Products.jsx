@@ -89,19 +89,26 @@ export default function Products() {
       <p className="eyebrow">فروشگاه</p>
       <h1 style={{ fontSize: 'var(--t-h1)', marginBlock: 'var(--s2) var(--s4)' }}>{heading}</h1>
 
-      <div className="row" style={{ gap: 'var(--s2)', marginBlockEnd: 'var(--s4)' }}>
+      <form
+        className="searchbar"
+        onSubmit={(e) => { e.preventDefault(); setParam('q', draft.trim()); e.target.querySelector('input')?.blur(); }}
+      >
         <input
           className="field"
-          placeholder="تیشرت مشکی اورسایز، پک، بچگانه…"
+          type="search"
+          enterKeyHint="search"
+          autoComplete="off"
+          placeholder="تیشرت مشکی اورسایز، پک…"
           value={draft}
           onChange={(e) => setDraft(e.target.value)}
-          onKeyDown={(e) => e.key === 'Enter' && setParam('q', draft.trim())}
           aria-label="جست‌وجو در محصولات"
         />
-        <button className="btn btn-primary" onClick={() => setParam('q', draft.trim())}>بگرد</button>
-      </div>
+        <button className="btn btn-primary" type="submit">بگرد</button>
+      </form>
 
-      <div className="suggestions" style={{ marginBlockEnd: 'var(--s2)' }}>
+      {/* Filter rows scroll sideways and run to the screen edge — the cut-off
+          chip is what tells a phone user there is more to the right. */}
+      <div className="suggestions bleed filter-row">
         {categories.map((c) => (
           <button key={c.slug} className="chip" aria-pressed={cat === c.slug} onClick={() => setParam('cat', cat === c.slug ? '' : c.slug)}>
             {c.name}
@@ -109,7 +116,7 @@ export default function Products() {
         ))}
       </div>
 
-      <div className="suggestions" style={{ marginBlockEnd: 'var(--s2)' }}>
+      <div className="suggestions bleed filter-row">
         {FITS.map((f) => (
           <button key={f} className="chip" aria-pressed={fit === f} onClick={() => setParam('fit', fit === f ? '' : f)}>
             {f}
@@ -117,12 +124,12 @@ export default function Products() {
         ))}
       </div>
 
-      <div className="row" style={{ gap: 'var(--s2)', marginBlockEnd: 'var(--s4)', flexWrap: 'wrap' }}>
-        <span className="muted" style={{ fontSize: 'var(--t-xs)' }}>رنگ:</span>
+      <div className="suggestions bleed filter-row filter-colors">
+        <span className="muted filter-legend">رنگ</span>
         {palette.map(([name, hex]) => (
           <button
             key={name}
-            className="sw"
+            className="sw sw-lg"
             style={{ background: hex }}
             aria-pressed={color === name}
             aria-label={`فیلتر رنگ ${name}`}
@@ -130,22 +137,24 @@ export default function Products() {
             onClick={() => setParam('color', color === name ? '' : name)}
           />
         ))}
-        {active && (
-          <button className="btn-quiet" style={{ fontSize: 'var(--t-xs)' }} onClick={() => setParams({}, { replace: true })}>
-            پاک‌کردن فیلترها
-          </button>
-        )}
       </div>
 
-      <div className="row between" style={{ marginBlockEnd: 'var(--s4)', flexWrap: 'wrap' }}>
-        <span className="muted" style={{ fontSize: 'var(--t-sm)' }}>
+      <div className="results-bar">
+        <span className="muted results-count">
           {loading ? 'در حال شمردن…' : `${fa(data?.length ?? 0)} مدل${priceHint ? ` · ${priceHint}` : ''}`}
         </span>
-        <select className="field" style={{ width: 'auto' }} value={sort} onChange={(e) => setParam('sort', e.target.value)} aria-label="ترتیب نمایش">
-          {SORTS.map(([v, l]) => (
-            <option key={v} value={v}>{l}</option>
-          ))}
-        </select>
+        <div className="row" style={{ gap: 'var(--s2)' }}>
+          {active && (
+            <button className="btn-quiet" style={{ fontSize: 'var(--t-xs)' }} onClick={() => setParams({}, { replace: true })}>
+              پاک‌کردن فیلترها
+            </button>
+          )}
+          <select className="field" style={{ width: 'auto' }} value={sort} onChange={(e) => setParam('sort', e.target.value)} aria-label="ترتیب نمایش">
+            {SORTS.map(([v, l]) => (
+              <option key={v} value={v}>{l}</option>
+            ))}
+          </select>
+        </div>
       </div>
 
       {loading && <SkeletonGrid count={8} />}

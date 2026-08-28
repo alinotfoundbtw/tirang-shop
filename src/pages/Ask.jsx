@@ -93,7 +93,7 @@ export default function Ask() {
         <div ref={logRef} />
       </div>
 
-      <div className="suggestions">
+      <div className="suggestions bleed">
         {OPENERS.map((s) => (
           <button key={s} className="chip" onClick={() => send(s)} disabled={busy}>
             {s}

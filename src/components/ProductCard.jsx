@@ -60,6 +60,7 @@ export default function ProductCard({ product: p, eager, onQuickView }) {
                 aria-pressed={i === ci}
                 aria-label={`رنگ ${c.name}`}
                 onMouseEnter={() => preload(c.photos[0])}
+                onTouchStart={() => preload(c.photos[0])}
                 onClick={() => setCi(i)}
               />
             ))}

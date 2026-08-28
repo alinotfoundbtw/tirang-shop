@@ -48,6 +48,7 @@ export default function Home() {
                     aria-pressed={i === hc}
                     aria-label={`نمایش رنگ ${c.name}`}
                     onMouseEnter={() => { setHc(i); preload(c.photos[0]); }}
+                    onTouchStart={() => preload(c.photos[0])}
                     onClick={() => setHc(i)}
                   />
                 ))}
@@ -74,8 +75,12 @@ export default function Home() {
                 alt={`${hero.name} — رنگ ${hero.colors[hc].name}`}
                 eager
                 tone={hero.colors[hc].hex}
-                sizes="(max-width: 700px) 100vw, 520px"
+                sizes="(max-width: 699px) 100vw, 520px"
               />
+              <span className="hero-tag" aria-hidden="true">
+                {hero.name}
+                <small>{hero.colors[hc].name}</small>
+              </span>
             </Link>
           )}
         </div>

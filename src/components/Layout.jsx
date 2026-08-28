@@ -66,7 +66,7 @@ export default function Layout() {
             <NavLink to="/admin">پنل فروشنده</NavLink>
           </nav>
 
-          <div className="row" style={{ gap: 2 }}>
+          <div className="header-actions">
             <Link to="/products" className="icon-btn" aria-label="جست‌وجو">
               <Icon d={icons.search} />
             </Link>
@@ -82,7 +82,7 @@ export default function Layout() {
         </div>
       </header>
 
-      <main id="main" className="has-tabbar">
+      <main id="main">
         <Outlet />
       </main>
 
@@ -97,21 +97,27 @@ export default function Layout() {
             </div>
             <div>
               <h3>فروشگاه</h3>
-              <Link to="/products">همهٔ تیشرت‌ها</Link>
-              <Link to="/products?cat=pack">پک اقتصادی</Link>
-              <Link to="/products?cat=kids">بچگانه</Link>
-              <Link to="/wishlist">علاقه‌مندی‌ها</Link>
+              <nav aria-label="فروشگاه">
+                <Link to="/products">همهٔ تیشرت‌ها</Link>
+                <Link to="/products?cat=pack">پک اقتصادی</Link>
+                <Link to="/products?cat=kids">بچگانه</Link>
+                <Link to="/wishlist">علاقه‌مندی‌ها</Link>
+              </nav>
             </div>
             <div>
               <h3>راهنما</h3>
-              <Link to="/faq">جدول اندازه</Link>
-              <Link to="/faq">تعویض و مرجوعی</Link>
-              <Link to="/ask">مشاور خرید</Link>
+              <nav aria-label="راهنما">
+                <Link to="/faq">جدول اندازه</Link>
+                <Link to="/faq">تعویض و مرجوعی</Link>
+                <Link to="/ask">مشاور خرید</Link>
+              </nav>
             </div>
             <div>
               <h3>ارتباط</h3>
-              <a href="https://instagram.com" rel="noopener noreferrer nofollow" target="_blank">اینستاگرام</a>
-              <a href="tel:+982100000000">۰۲۱-۰۰۰۰۰۰۰۰</a>
+              <nav aria-label="ارتباط">
+                <a href="https://instagram.com" rel="noopener noreferrer nofollow" target="_blank">اینستاگرام</a>
+                <a href="tel:+982100000000">۰۲۱-۰۰۰۰۰۰۰۰</a>
+              </nav>
             </div>
           </div>
           <div className="footer-base">

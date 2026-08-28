@@ -29,7 +29,7 @@ export function ColorPicker({ product, ci, onPick, big = true }) {
       <span className="label">
         رنگ — <b style={{ color: 'var(--ink)' }}>{color.name}</b>
       </span>
-      <div className="row" style={{ gap: 'var(--s2)', flexWrap: 'wrap' }}>
+      <div className="row colorpick-row" style={{ flexWrap: 'wrap' }}>
         {product.colors.map((c, i) => {
           const none = Object.values(c.stock).every((n) => n === 0);
           return (
@@ -40,6 +40,7 @@ export function ColorPicker({ product, ci, onPick, big = true }) {
               aria-pressed={i === ci}
               aria-label={`رنگ ${c.name}${none ? '، ناموجود' : ''}`}
               onMouseEnter={() => preload(c.photos[0])}
+              onTouchStart={() => preload(c.photos[0])}
               onClick={() => onPick(i)}
             />
           );
@@ -56,7 +57,18 @@ export function SizePicker({ product, color, size, onPick }) {
     <div>
       <div className="row between">
         <span className="label">اندازه</span>
-        <a href="#size-table" className="link-more" style={{ fontSize: 'var(--t-xs)' }}>جدول اندازه</a>
+        <a
+          href="#size-table"
+          className="link-more"
+          style={{ fontSize: 'var(--t-xs)' }}
+          onClick={() => {
+            // Jumping to a collapsed <details> lands the reader on a closed row.
+            const el = document.getElementById('size-table');
+            if (el) el.open = true;
+          }}
+        >
+          جدول اندازه
+        </a>
       </div>
       <div className="size-grid">
         {product.sizes.map((s) => {

@@ -20,28 +20,31 @@ export function Faq() {
       <p className="eyebrow">راهنما</p>
       <h1 style={{ fontSize: 'var(--t-h1)', marginBlockEnd: 'var(--s5)' }}>سؤال‌های پرتکرار</h1>
 
-      <table className="sizes" style={{ marginBlockEnd: 'var(--s6)' }}>
-        <caption className="muted" style={{ textAlign: 'start', fontSize: 'var(--t-xs)', paddingBlockEnd: 'var(--s2)' }}>
-          اندازه‌ها بر حسب سانتی‌متر و روی لباس خوابیده گرفته شده‌اند.
-        </caption>
-        <thead>
-          <tr><th>سایز</th><th>دور سینه</th><th>قد</th><th>سرشانه</th><th>مناسب قد</th></tr>
-        </thead>
-        <tbody>
-          {[
-            ['S', '۹۶', '۶۸', '۴۴', 'تا ۱۶۸'],
-            ['M', '۱۰۲', '۷۰', '۴۶', '۱۶۸ تا ۱۷۶'],
-            ['L', '۱۰۸', '۷۲', '۴۸', '۱۷۶ تا ۱۸۴'],
-            ['XL', '۱۱۴', '۷۴', '۵۰', '۱۸۴ تا ۱۹۰'],
-            ['XXL', '۱۲۰', '۷۶', '۵۲', 'بالای ۱۹۰'],
-          ].map((r) => (
-            <tr key={r[0]}>
-              <td><b>{r[0]}</b></td>
-              {r.slice(1).map((c, i) => <td key={i} className="num">{c}</td>)}
-            </tr>
-          ))}
-        </tbody>
-      </table>
+      {/* Five columns of nowrap numbers do not fit a 360px screen — let them scroll. */}
+      <div className="table-scroll bleed" style={{ marginBlockEnd: 'var(--s6)' }}>
+        <table className="sizes">
+          <caption className="muted" style={{ textAlign: 'start', fontSize: 'var(--t-xs)', paddingBlockEnd: 'var(--s2)' }}>
+            اندازه‌ها بر حسب سانتی‌متر و روی لباس خوابیده گرفته شده‌اند.
+          </caption>
+          <thead>
+            <tr><th>سایز</th><th>دور سینه</th><th>قد</th><th>سرشانه</th><th>مناسب قد</th></tr>
+          </thead>
+          <tbody>
+            {[
+              ['S', '۹۶', '۶۸', '۴۴', 'تا ۱۶۸'],
+              ['M', '۱۰۲', '۷۰', '۴۶', '۱۶۸ تا ۱۷۶'],
+              ['L', '۱۰۸', '۷۲', '۴۸', '۱۷۶ تا ۱۸۴'],
+              ['XL', '۱۱۴', '۷۴', '۵۰', '۱۸۴ تا ۱۹۰'],
+              ['XXL', '۱۲۰', '۷۶', '۵۲', 'بالای ۱۹۰'],
+            ].map((r) => (
+              <tr key={r[0]}>
+                <td><b>{r[0]}</b></td>
+                {r.slice(1).map((c, i) => <td key={i} className="num">{c}</td>)}
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
 
       {faqs.map((f) => (
         <details key={f.q} className="accordion">

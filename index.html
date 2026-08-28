@@ -4,7 +4,18 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="theme-color" content="#2B45E0" />
+
+    <!-- The browser chrome takes the page's colour, not the brand's accent, so
+         the status bar reads as part of the shop instead of a blue stripe. -->
+    <meta name="theme-color" content="#F8F7F4" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#101116" media="(prefers-color-scheme: dark)" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="تیرنگ" />
+    <!-- Stops iOS auto-linking runs of digits (size tables, prices) as phone
+         numbers. The explicit tel: link in the footer still works. -->
+    <meta name="format-detection" content="telephone=no" />
 
     <!-- ── SEO (defaults; every route overwrites these at runtime via src/lib/seo.js) ── -->
     <title>تیرنگ | تیشرت پایه و طرح‌دار</title>

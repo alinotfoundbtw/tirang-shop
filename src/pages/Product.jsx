@@ -156,21 +156,23 @@ function Detail({ p }) {
             {sizeRows.length > 0 && (
               <details className="accordion" id="size-table">
                 <summary>جدول اندازه (سانتی‌متر)</summary>
-                <table className="sizes">
-                  <thead>
-                    <tr><th>سایز</th><th>دور سینه</th><th>قد</th><th>سرشانه</th></tr>
-                  </thead>
-                  <tbody>
-                    {sizeRows.map((s) => (
-                      <tr key={s}>
-                        <td><b>{s}</b></td>
-                        {MEASURES[s].map((m, i) => (
-                          <td key={i} className="num">{m}</td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
+                <div className="table-scroll">
+                  <table className="sizes">
+                    <thead>
+                      <tr><th>سایز</th><th>دور سینه</th><th>قد</th><th>سرشانه</th></tr>
+                    </thead>
+                    <tbody>
+                      {sizeRows.map((s) => (
+                        <tr key={s}>
+                          <td><b>{s}</b></td>
+                          {MEASURES[s].map((m, i) => (
+                            <td key={i} className="num">{m}</td>
+                          ))}
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
                 <p>اندازه‌ها روی لباس خوابیده گرفته شده‌اند، نه روی بدن. حدود یک سانت خطا طبیعی است.</p>
               </details>
             )}

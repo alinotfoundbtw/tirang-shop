@@ -31,6 +31,39 @@ export default function Gallery({ photos, alt }) {
   const fine = typeof window !== 'undefined' && window.matchMedia('(hover: hover)').matches;
   const step = (by) => setI((n) => (n + by + photos.length) % photos.length);
 
+  /* Touch: a horizontal drag flips to the next shot, a tap opens the lightbox.
+     Without the distinction every attempted swipe fires the lightbox instead. */
+  const swipe = useRef(null);
+  /* Set when a swipe consumed the gesture, so the click that may follow does
+     not also open the lightbox. Cleared on the next touchstart rather than by
+     that click: after a real swipe the browser often suppresses the click
+     altogether, and a flag left standing would eat the following tap. */
+  const dragged = useRef(false);
+  const onTouchStart = (e) => {
+    dragged.current = false;
+    const t = e.touches[0];
+    swipe.current = { x: t.clientX, y: t.clientY, moved: false };
+  };
+  const onTouchMove = (e) => {
+    const g = swipe.current;
+    if (!g) return;
+    const t = e.touches[0];
+    if (Math.abs(t.clientX - g.x) > 10 || Math.abs(t.clientY - g.y) > 10) g.moved = true;
+  };
+  const onTouchEnd = (e) => {
+    const g = swipe.current;
+    swipe.current = null;
+    if (!g || !g.moved) return;
+    const t = e.changedTouches[0];
+    const dx = t.clientX - g.x;
+    const dy = t.clientY - g.y;
+    // Only a decisive sideways drag counts; anything else was a scroll.
+    if (Math.abs(dx) > 45 && Math.abs(dx) > Math.abs(dy)) {
+      step(dx > 0 ? 1 : -1);
+      dragged.current = true;
+    }
+  };
+
   return (
     <>
       <div className="gallery">
@@ -40,7 +73,13 @@ export default function Gallery({ photos, alt }) {
           onMouseEnter={() => fine && setZoom(true)}
           onMouseLeave={() => setZoom(false)}
           onMouseMove={(e) => zoom && move(e)}
-          onClick={() => setOpen(true)}
+          onTouchStart={onTouchStart}
+          onTouchMove={onTouchMove}
+          onTouchEnd={onTouchEnd}
+          onClick={() => {
+            if (dragged.current) return;
+            setOpen(true);
+          }}
           role="button"
           tabIndex={0}
           onKeyDown={(e) => {
@@ -55,7 +94,7 @@ export default function Gallery({ photos, alt }) {
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" aria-hidden="true">
               <circle cx="11" cy="11" r="7" /><path d="m16.5 16.5 4 4M11 8v6M8 11h6" />
             </svg>
-            {fine ? 'برای بزرگ‌نمایی نگه دارید' : 'برای بزرگ‌نمایی بزنید'}
+            {fine ? 'برای بزرگ‌نمایی نگه دارید' : photos.length > 1 ? 'بزنید یا بکشید' : 'برای بزرگ‌نمایی بزنید'}
           </span>
           {photos.length > 1 && (
             <>
