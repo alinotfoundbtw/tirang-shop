@@ -2114,6 +2114,89 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .prod-actions { grid-area: actions; }
 }
 
+/* ── مدیریت موجودی ─────────────────────────────────────────
+   A grid you can walk with a keyboard. Cells carry their own state —
+   empty, nearly empty, edited — so the table answers "what needs
+   restocking" without being read row by row.
+   ───────────────────────────────────────────────────────── */
+.stock-card { padding-block-end: var(--s3); }
+.stock-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s3); flex-wrap: wrap;
+  padding-block-end: var(--s3); margin-block-end: var(--s3);
+  border-block-end: 1px solid var(--line);
+}
+.stock-head b { font-family: var(--font-display); font-size: 1rem; }
+.stock-head small { display: block; font-size: var(--t-xs); color: var(--ink-45); }
+.stock-total { font-size: var(--t-sm); color: var(--ink-45); flex: none; }
+
+.stock-table { width: 100%; border-collapse: collapse; }
+.stock-table th {
+  font-size: var(--t-xs); color: var(--ink-45); font-weight: 600;
+  text-align: center; padding-block-end: var(--s2);
+  border-block-end: 1px solid var(--line);
+}
+.stock-table th:first-child { text-align: start; }
+.stock-table td { padding: var(--s2) 3px; border-block-end: 1px solid var(--line); }
+.stock-table tr:last-child td { border-block-end: 0; }
+
+.stock-colour { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--t-sm); white-space: nowrap; }
+.stock-colour i {
+  inline-size: 16px; block-size: 16px; border-radius: var(--r-full);
+  border: 1px solid var(--line-strong); flex: none;
+}
+
+.stock-cell {
+  inline-size: 54px; min-block-size: 40px;
+  text-align: center; font-variant-numeric: tabular-nums;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm);
+  background: var(--surface); color: var(--ink);
+  font-size: var(--t-sm);
+  transition: border-color 0.15s, background 0.15s, box-shadow 0.15s;
+}
+.stock-cell:focus {
+  outline: none; border-color: var(--wine);
+  box-shadow: 0 0 0 3px var(--wine-soft);
+}
+/* Zero is a hole in the catalog, not a small number. */
+.stock-cell.out { background: var(--cherry-soft); border-color: color-mix(in srgb, var(--cherry) 40%, var(--line)); color: var(--cherry); }
+.stock-cell.low { background: color-mix(in srgb, var(--warn) 12%, var(--paper)); border-color: color-mix(in srgb, var(--warn) 38%, var(--line)); color: var(--warn); }
+/* An edited cell has to look different from a saved one, or the save bar is
+   the only thing that knows what changed. */
+.stock-cell.edited { border-color: var(--wine); border-width: 2px; font-weight: 700; }
+.stock-rowtotal { text-align: center; font-size: var(--t-sm); color: var(--ink-45); }
+
+.stock-sep {
+  inline-size: 1px; block-size: 22px; flex: none;
+  background: var(--line-strong); align-self: center;
+  margin-inline: var(--s2);
+}
+
+/* The bar that will not let you walk away with unsaved counts. */
+.stock-bar {
+  position: sticky; inset-block-end: var(--sab); z-index: 30;
+  display: flex; align-items: center; justify-content: space-between;
+  gap: var(--s3); flex-wrap: wrap;
+  margin-block-start: var(--s4);
+  padding: var(--s3) var(--s4);
+  border-radius: var(--r-md);
+  background: var(--ink); color: var(--paper);
+  box-shadow: var(--shadow-2);
+  animation: bar-up 0.24s var(--ease) both;
+}
+@keyframes bar-up { from { opacity: 0; transform: translateY(10px); } }
+.stock-bar > span:first-child { display: inline-flex; align-items: center; gap: var(--s2); font-size: var(--t-sm); }
+.stock-bar .btn { min-height: 38px; display: inline-flex; gap: 6px; }
+.stock-bar .btn-ghost { border-color: color-mix(in srgb, var(--paper) 35%, transparent); color: var(--paper); }
+.stock-bar .btn-ghost:hover { background: color-mix(in srgb, var(--paper) 14%, transparent); }
+
+@media (max-width: 560px) {
+  .stock-cell { inline-size: 46px; }
+  .stock-bar { flex-direction: column; align-items: stretch; }
+  .stock-bar .row { justify-content: stretch; }
+  .stock-bar .btn { flex: 1; }
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (min-width: 700px) {
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }

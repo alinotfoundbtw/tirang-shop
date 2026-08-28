@@ -127,7 +127,10 @@ export default function Dashboard() {
         </div>
 
         <div className="panel">
-          <h3>رو به اتمام — قبل از خالی‌شدن سفارش بدهید</h3>
+          <div className="row between" style={{ marginBlockEnd: 'var(--s3)' }}>
+            <h3 style={{ margin: 0, border: 0, padding: 0 }}>رو به اتمام — قبل از خالی‌شدن سفارش بدهید</h3>
+            <Link className="link-more" to={`/${ADMIN_PATH}/stock`}>مدیریت موجودی</Link>
+          </div>
           {low.length === 0 && (
             <p className="panel-empty">هیچ کالایی رو به اتمام نیست. موجودی همهٔ سایزها سالم است.</p>
           )}

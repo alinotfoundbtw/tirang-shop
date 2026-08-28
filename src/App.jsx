@@ -19,6 +19,7 @@ const Admin = lazy(() => import('./admin/Admin'));
 const Dashboard = lazy(() => import('./admin/Dashboard'));
 const Catalog = lazy(() => import('./admin/Catalog').then((m) => ({ default: m.Catalog })));
 const AdminOrders = lazy(() => import('./admin/Orders'));
+const Stock = lazy(() => import('./admin/Stock'));
 
 class Boundary extends Component {
   state = { error: null };
@@ -63,6 +64,7 @@ export default function App() {
             <Route index element={<Dashboard />} />
             <Route path="catalog" element={<Catalog />} />
             <Route path="orders" element={<AdminOrders />} />
+            <Route path="stock" element={<Stock />} />
           </Route>
         </Routes>
       </Suspense>
