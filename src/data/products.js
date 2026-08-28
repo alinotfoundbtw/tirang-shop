@@ -12,7 +12,10 @@
    /tirang-shop/ rather than the domain root. fetch-photos.mjs asks Pexels for
    JPEG, so every vendored file is a .jpg regardless of its source format —
    `ext` now only picks which original to fetch, not what lands on disk. */
-const px = (id) => `${import.meta.env.BASE_URL}photos/${id}.jpg`;
+/* import.meta.env only exists under Vite; the ?? keeps this module importable
+   from plain Node so retrieval can be evaluated outside the browser. */
+const BASE = import.meta.env?.BASE_URL ?? '/';
+const px = (id) => `${BASE}photos/${id}.jpg`;
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 

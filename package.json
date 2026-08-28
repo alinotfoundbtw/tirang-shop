@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "api": "node server/index.mjs",
-    "start": "concurrently -n web,api -c magenta,cyan \"npm:dev\" \"npm:api\""
+    "rag": "node scripts/rag-eval.mjs"
   },
   "dependencies": {
     "react": "^18.3.1",
@@ -18,7 +17,6 @@
   },
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.1",
-    "concurrently": "^9.0.1",
     "vite": "^5.4.8"
   }
 }

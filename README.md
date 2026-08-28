@@ -6,12 +6,14 @@ re-skinned for a new client in an afternoon.
 
 ```bash
 npm install
-npm run dev                                  # storefront on :5173
-ANTHROPIC_API_KEY=sk-... npm run api         # assistant on :8787 (optional)
+npm run dev      # storefront on :5173
+npm run rag      # check the assistant against ~23 real questions
 ```
 
-Without the API key the assistant still answers — it falls back to the local
-answer builder in `src/lib/rag.js`. The demo never dead-ends.
+There is no model behind the assistant and no API key to set. `src/lib/rag.js`
+is the whole thing: BM25 over the catalog, the slots the shopper named applied
+on top, and an answer assembled from the matching rows. It runs in the browser
+in under a millisecond and works offline.
 
 Routes: `/` `/products` `/p/:slug` `/cart` `/wishlist` `/ask` `/faq` and
 `/admin` (خلاصهٔ فروش، محصولات، سفارش‌ها، ظاهر فروشگاه).
@@ -90,11 +92,11 @@ owner can read the code.
   scored with IDF so a rare word like «تعویض» decides the match and a common one
   like «سایز» doesn't.
 
-`server/index.mjs` holds the API key and the system prompt, so a visitor can
-neither read the key nor rewrite the shop's instructions. It sends only the rows
-retrieval already picked, including per-size stock, and instructs the model to
-refuse anything not in them — no invented prices, sizes, or delivery promises.
-Rate limit: 20 questions per IP per 5 minutes.
+Because every answer is assembled from catalog rows rather than generated,
+the assistant cannot invent a price, a colour or a delivery promise: the worst
+it can do is pick the wrong row. `scripts/rag-eval.mjs` guards the cases that
+matter — among them that it never leads with a size it cannot ship, and that
+every product is findable by its own name.
 
 The panel's **«چیزهایی که مشتری خواست و نداشتیم»** table is built from questions
 the assistant couldn't answer, and **«سایزی که برمی‌گردد»** shows return rate per

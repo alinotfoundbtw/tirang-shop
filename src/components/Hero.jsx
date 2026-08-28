@@ -4,7 +4,9 @@ import { products } from '../data/products';
 import { armMorph } from '../lib/morph';
 import { toman, fa } from '../lib/format';
 
-const ROTATE_MS = 5000;
+/* Long enough to read the name and the price and still decide to tap.
+   Five seconds moved on while you were reading. */
+const ROTATE_MS = 8500;
 
 /** New arrivals lead; bestsellers fill the rest so the banner is never thin. */
 function pickSlides(limit = 5) {

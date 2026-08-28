@@ -236,7 +236,7 @@ textarea.field { min-height: 96px; resize: vertical; }
   position: absolute; inset: 0;
   width: 100%; height: 100%; object-fit: cover;
   opacity: 0;
-  transition: opacity 0.7s var(--ease);
+  transition: opacity 1.1s var(--ease);
 }
 .hero-shot.on { opacity: 1; }
 .hero-scrim {

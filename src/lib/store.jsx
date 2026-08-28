@@ -114,26 +114,6 @@ export function useAsync(fn, deps = [], { delay = 380 } = {}) {
   return { ...state, retry: () => setNonce((n) => n + 1) };
 }
 
-/** Height + build → the size most people that shape end up keeping.
- *  Deliberately advisory: it names a size and says why, then gets out of the way. */
-export function suggestSize({ height, weight, fit }) {
-  if (!height || !weight) return null;
-  const bmi = weight / (height / 100) ** 2;
-  const scale = ['S', 'M', 'L', 'XL', 'XXL'];
-  let idx = 1;
-  if (height < 165) idx = 0;
-  else if (height < 175) idx = 1;
-  else if (height < 183) idx = 2;
-  else idx = 3;
-  if (bmi > 27) idx += 1;
-  if (bmi < 19) idx -= 1;
-  if (fit === 'اسلیم') idx += 1;
-  if (String(fit).includes('اورسایز')) idx -= 1;
-  idx = Math.max(0, Math.min(scale.length - 1, idx));
-  const note = String(fit).includes('اورسایز')
-    ? 'این مدل اورسایز است، برای همین یک سایز پایین‌تر پیشنهاد شد.'
-    : fit === 'اسلیم'
-      ? 'این مدل اسلیم است و به بدن می‌خورد، برای همین یک سایز بالاتر پیشنهاد شد.'
-      : 'برای تن‌خور آزادتر یک سایز بالاتر بگیرید.';
-  return { size: scale[idx], note };
-}
+/* Lives in lib/sizing.js so retrieval can use the same table without
+   importing React. Re-exported here because callers already import it. */
+export { suggestSize } from './sizing';

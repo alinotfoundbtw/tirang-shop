@@ -5,11 +5,7 @@ export default defineConfig({
   // GitHub Pages serves this project site from /tirang-shop/, not the domain root.
   base: process.env.GITHUB_PAGES ? '/tirang-shop/' : '/',
   plugins: [react()],
-  server: {
-    port: 5173,
-    // The bot talks to server/index.mjs so the API key never reaches the browser.
-    proxy: { '/api': 'http://localhost:8787' },
-  },
+  server: { port: 5173 },
   build: {
     rollupOptions: {
       output: {
