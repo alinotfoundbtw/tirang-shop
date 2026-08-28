@@ -32,7 +32,7 @@ const art = {
 
 const FITS = ['اورسایز', 'رگولار', 'اسلیم', 'رگولار زنانه', 'رگولار بچگانه'];
 
-const blankColor = () => ({ name: '', hex: '#141414', photos: [], stock: Object.fromEntries(SIZES.map((s) => [s, 0])) });
+const blankColor = (sizes = SIZES) => ({ name: '', hex: '#141414', photos: [], stock: Object.fromEntries(sizes.map((s) => [s, 0])) });
 
 const BLANK = {
   name: '', subtitle: '', category: 'basic', price: '', oldPrice: '',
@@ -40,6 +40,7 @@ const BLANK = {
   model: 'قد مدل ۱۷۸ سانت، سایز M پوشیده',
   care: 'شست‌وشو با آب سرد، پشت‌ورو، بدون خشک‌کن',
   bio: '', tags: '', days: '5', banner: null,
+  sizes: SIZES, sizeLabels: undefined,
   colors: [blankColor()],
 };
 
@@ -52,9 +53,13 @@ function fromProduct(p) {
     fit: p.fit, gsm: String(p.gsm), fabric: p.fabric, model: p.model, care: p.care,
     bio: p.bio, tags: p.tags.join('، '), days: String(p.days ?? 5),
     banner: p.banner ?? null,
+    // A product's own sizes, not the global five: the kids' tee has three,
+    // labelled in years, and reading it through SIZES invented two.
+    sizes: p.sizes ?? SIZES,
+    sizeLabels: p.sizeLabels,
     colors: p.colors.map((c) => ({
       name: c.name, hex: c.hex, photos: [...c.photos],
-      stock: Object.fromEntries(SIZES.map((s) => [s, c.stock?.[s] ?? 0])),
+      stock: Object.fromEntries((p.sizes ?? SIZES).map((s) => [s, c.stock?.[s] ?? 0])),
     })),
   };
 }
@@ -109,6 +114,7 @@ export default function ProductForm({ editing, onDone, onCancel }) {
     const noPhoto = colors.find((c) => c.photos.length === 0);
     if (noPhoto) return setError(`رنگ «${noPhoto.name}» عکس ندارد. هر رنگ عکس خودش را لازم دارد.`);
 
+    const sizeList = f.sizes ?? SIZES;
     const stamp = Date.now();
     const slugBase = f.name.trim().replace(/\s+/g, '-').replace(/[^\p{L}\p{N}-]/gu, '');
     const product = {
@@ -130,14 +136,15 @@ export default function ProductForm({ editing, onDone, onCancel }) {
       sales: editing?.sales ?? 0,
       days: Number(f.days) || 5,
       new: editing ? editing.new : true,
-      sizes: SIZES,
+      sizes: sizeList,
+      ...(f.sizeLabels ? { sizeLabels: f.sizeLabels } : {}),
       colors: colors.map((c) => ({
         name: c.name.trim(),
         hex: c.hex,
         photos: c.photos,
-        stock: Object.fromEntries(SIZES.map((s) => [s, Number(c.stock[s]) || 0])),
+        stock: Object.fromEntries(sizeList.map((s) => [s, Number(c.stock[s]) || 0])),
       })),
-      stock: colors.reduce((sum, c) => sum + SIZES.reduce((n, s) => n + (Number(c.stock[s]) || 0), 0), 0),
+      stock: colors.reduce((sum, c) => sum + sizeList.reduce((n, s) => n + (Number(c.stock[s]) || 0), 0), 0),
       banner: f.banner,
       tone: colors[0].hex,
       bio: f.bio.trim(),
@@ -261,7 +268,7 @@ export default function ProductForm({ editing, onDone, onCancel }) {
       <section>
         <div className="row between">
           <h4 style={{ margin: 0 }}>رنگ‌ها و موجودی</h4>
-          <button type="button" className="btn-quiet" onClick={() => setF({ ...f, colors: [...f.colors, blankColor()] })}>
+          <button type="button" className="btn-quiet" onClick={() => setF({ ...f, colors: [...f.colors, blankColor(f.sizes ?? SIZES)] })}>
             <Icon d={art.plus} size={14} /> رنگ تازه
           </button>
         </div>
@@ -311,9 +318,9 @@ export default function ProductForm({ editing, onDone, onCancel }) {
 
             <span className="label">موجودی هر سایز</span>
             <div className="stockrow">
-              {SIZES.map((s) => (
+              {(f.sizes ?? SIZES).map((s) => (
                 <label key={s}>
-                  <small>{s}</small>
+                  <small>{f.sizeLabels?.[s] ?? s}</small>
                   <input
                     className="field num" inputMode="numeric" value={c.stock[s]}
                     onChange={(e) => setColor(i, { stock: { ...c.stock, [s]: e.target.value } })}

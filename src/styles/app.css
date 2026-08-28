@@ -2166,6 +2166,29 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 .stock-cell.edited { border-color: var(--wine); border-width: 2px; font-weight: 700; }
 .stock-rowtotal { text-align: center; font-size: var(--t-sm); color: var(--ink-45); }
 
+/* Steppers beside every cell. Typing is faster for a stocktake; a button is
+   faster for "one sold" — and a field that only accepts typing reads as
+   locked to anyone who does not try. */
+.stock-stack { display: inline-flex; align-items: center; gap: 2px; }
+.stock-steps { display: grid; gap: 2px; }
+.stock-steps button {
+  inline-size: 22px; block-size: 19px;
+  display: grid; place-items: center;
+  border: 1px solid var(--line-strong); border-radius: 5px;
+  background: var(--surface); color: var(--ink-45);
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+.stock-steps button:hover:not([disabled]) { background: var(--wine); border-color: var(--wine); color: #fff; }
+.stock-steps button:active:not([disabled]) { transform: scale(0.9); }
+.stock-steps button[disabled] { opacity: 0.35; cursor: not-allowed; }
+
+.stock-fill {
+  font-size: 10px; min-height: 24px; padding-inline: 6px;
+  border: 1px dashed var(--line-strong); border-radius: var(--r-sm);
+  margin-inline-start: var(--s2);
+}
+.stock-fill:hover { border-color: var(--wine); color: var(--wine); }
+
 .stock-sep {
   inline-size: 1px; block-size: 22px; flex: none;
   background: var(--line-strong); align-self: center;
@@ -2191,7 +2214,8 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 .stock-bar .btn-ghost:hover { background: color-mix(in srgb, var(--paper) 14%, transparent); }
 
 @media (max-width: 560px) {
-  .stock-cell { inline-size: 46px; }
+  .stock-cell { inline-size: 42px; }
+  .stock-steps button { inline-size: 20px; }
   .stock-bar { flex-direction: column; align-items: stretch; }
   .stock-bar .row { justify-content: stretch; }
   .stock-bar .btn { flex: 1; }

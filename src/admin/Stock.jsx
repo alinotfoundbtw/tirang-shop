@@ -31,6 +31,8 @@ const art = {
   save: <><path d="M5 4h11l3 3v13H5z" /><path d="M8 4v5h7M8 20v-6h8v6" /></>,
   undo: <path d="M4 10a8 8 0 1 1 1.2 5M4 5v5h5" />,
   warn: <><path d="M12 4 2.5 20h19z" /><path d="M12 10v4" /><circle cx="12" cy="17" r="0.7" fill="currentColor" stroke="none" /></>,
+  plus: <path d="M12 5v14M5 12h14" />,
+  minus: <path d="M5 12h14" />,
 };
 
 const FILTERS = [
@@ -56,12 +58,32 @@ export default function Stock() {
   const setCell = (p, colour, size, raw) => {
     // Keep it a string while typing so the field can be emptied, and clamp
     // only what is committed.
-    const clean = raw.replace(/[^\d۰-۹]/g, '');
+    const clean = String(raw).replace(/[^\d۰-۹]/g, '');
     setDraft((d) => ({
       ...d,
       [p.id]: {
         ...d[p.id],
         [colour.name]: { ...d[p.id]?.[colour.name], [size]: clean },
+      },
+    }));
+  };
+
+  const asNumber = (v) => Math.max(0, Number(normalize(String(v))) || 0);
+
+  /** Steppers, for the common case: one sold, one arrived. */
+  const bump = (p, colour, size, by) =>
+    setCell(p, colour, size, String(Math.max(0, asNumber(valueOf(p, colour, size)) + by)));
+
+  /** Sets every size of one colour at once — a delivery arrives as a batch. */
+  const fillRow = (p, colour) => {
+    const raw = window.prompt(`موجودی همهٔ سایزهای «${colour.name}» چند شود؟`, '');
+    if (raw === null) return;
+    const n = String(asNumber(raw));
+    setDraft((d) => ({
+      ...d,
+      [p.id]: {
+        ...d[p.id],
+        [colour.name]: Object.fromEntries(p.sizes.map((s) => [s, n])),
       },
     }));
   };
@@ -195,6 +217,14 @@ export default function Stock() {
                           <span className="stock-colour">
                             <i style={{ background: c.hex }} />
                             {c.name}
+                            <button
+                              type="button"
+                              className="btn-quiet stock-fill"
+                              onClick={() => fillRow(p, c)}
+                              title="همهٔ سایزهای این رنگ"
+                            >
+                              همه
+                            </button>
                           </span>
                         </td>
                         {p.sizes.map((s) => {
@@ -203,14 +233,34 @@ export default function Stock() {
                           const edited = draft[p.id]?.[c.name]?.[s] !== undefined;
                           return (
                             <td key={s}>
-                              <input
-                                className={`stock-cell ${n === 0 ? 'out' : n <= LOW ? 'low' : ''} ${edited ? 'edited' : ''}`}
-                                inputMode="numeric"
-                                value={shown}
-                                onFocus={(e) => e.target.select()}
-                                onChange={(e) => setCell(p, c, s, e.target.value)}
-                                aria-label={`${p.name} — ${c.name}، اندازهٔ ${p.sizeLabels?.[s] ?? s}`}
-                              />
+                              <span className="stock-stack">
+                                <input
+                                  className={`stock-cell ${n === 0 ? 'out' : n <= LOW ? 'low' : ''} ${edited ? 'edited' : ''}`}
+                                  type="text"
+                                  inputMode="numeric"
+                                  value={String(shown)}
+                                  onFocus={(e) => e.target.select()}
+                                  onChange={(e) => setCell(p, c, s, e.target.value)}
+                                  aria-label={`${p.name} — ${c.name}، اندازهٔ ${p.sizeLabels?.[s] ?? s}`}
+                                />
+                                <span className="stock-steps">
+                                  <button
+                                    type="button"
+                                    onClick={() => bump(p, c, s, 1)}
+                                    aria-label={`یکی اضافه به ${c.name} ${p.sizeLabels?.[s] ?? s}`}
+                                  >
+                                    <Icon d={art.plus} size={11} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => bump(p, c, s, -1)}
+                                    disabled={n === 0}
+                                    aria-label={`یکی کم از ${c.name} ${p.sizeLabels?.[s] ?? s}`}
+                                  >
+                                    <Icon d={art.minus} size={11} />
+                                  </button>
+                                </span>
+                              </span>
                             </td>
                           );
                         })}
