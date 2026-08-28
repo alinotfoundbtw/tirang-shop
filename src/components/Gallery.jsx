@@ -69,6 +69,7 @@ export default function Gallery({ photos, alt }) {
       <div className="gallery">
         <div
           ref={mainRef}
+          data-morph
           className={`gal-main ${zoom ? 'zooming' : ''}`}
           onMouseEnter={() => fine && setZoom(true)}
           onMouseLeave={() => setZoom(false)}

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categories, products } from '../data/products';
 import ProductCard from '../components/ProductCard';
 import QuickView from '../components/QuickView';
 import { Photo, preload } from '../components/States';
 import { useSeo } from '../lib/seo';
+import { armMorph } from '../lib/morph';
 import { fa } from '../lib/format';
 
 export default function Home() {
@@ -17,6 +18,7 @@ export default function Home() {
   const hero = products.find((p) => p.slug === 'oversize-basic');
   const [hc, setHc] = useState(0);
   const [quick, setQuick] = useState(null);
+  const heroRef = useRef(null);
 
   const fresh = products.filter((p) => p.new).slice(0, 6);
   const best = [...products].sort((a, b) => b.sales - a.sales).slice(0, 4);
@@ -69,7 +71,15 @@ export default function Home() {
           </div>
 
           {hero && (
-            <Link to={`/p/${hero.slug}`} className="hero-art" aria-label={hero.name}>
+            <Link
+              to={`/p/${hero.slug}`}
+              className="hero-art"
+              data-morph
+              ref={heroRef}
+              viewTransition
+              onClick={() => armMorph(heroRef.current)}
+              aria-label={hero.name}
+            >
               <Photo
                 src={hero.colors[hc].photos[0]}
                 alt={`${hero.name} — رنگ ${hero.colors[hc].name}`}

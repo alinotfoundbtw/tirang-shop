@@ -154,6 +154,12 @@ textarea.field { min-height: 96px; resize: vertical; }
 }
 .icon-btn:hover { background: var(--blush); }
 .icon-btn:active { transform: scale(0.9); background: var(--blush); }
+@keyframes badge-pop {
+  0% { scale: 1; }
+  35% { scale: 1.5; }
+  100% { scale: 1; }
+}
+.cart-count.pop { animation: badge-pop 0.42s var(--ease); }
 .cart-count {
   position: absolute; inset-block-start: 4px; inset-inline-start: 4px;
   min-width: 18px; height: 18px; border-radius: var(--r-full);
@@ -198,6 +204,8 @@ textarea.field { min-height: 96px; resize: vertical; }
 .ph { position: relative; overflow: hidden; background: var(--blush); }
 .ph img { width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity 0.4s var(--ease); }
 .ph img.ready { opacity: 1; }
+/* Held on the outgoing colourway while the new one decodes. */
+.ph img.ready.swapping { opacity: 0.4; transition: opacity 0.16s var(--ease); }
 .ph.failed::after {
   content: 'تصویر بارگذاری نشد';
   position: absolute; inset: 0; display: grid; place-items: center;
@@ -303,7 +311,7 @@ textarea.field { min-height: 96px; resize: vertical; }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-1); }
 /* No hover on a phone, so the press itself has to answer. */
 @media (hover: none) {
-  .card:has(a:active) { transform: scale(0.985); }
+  .card:has(a:active) { scale: 0.985; }
 }
 .card-media { position: relative; aspect-ratio: 3 / 4; }
 .card-media .ph { position: absolute; inset: 0; }
@@ -376,13 +384,31 @@ textarea.field { min-height: 96px; resize: vertical; }
 
 .card-quick {
   position: absolute; inset-inline: var(--s2); inset-block-end: var(--s2); z-index: 2;
+  display: flex; align-items: center; justify-content: center; gap: var(--s2);
   padding: 9px; border-radius: var(--r-full);
   background: color-mix(in srgb, var(--surface) 92%, transparent); backdrop-filter: blur(6px);
   font-size: var(--t-xs); font-weight: 600; text-align: center;
   opacity: 0; transform: translateY(6px); transition: 0.22s var(--ease);
 }
+.card-quick svg { display: none; }
 .card:hover .card-quick, .card:focus-within .card-quick { opacity: 1; transform: none; }
-@media (hover: none) { .card-quick { display: none; } }
+
+/* Touch has no hover to reveal the pill with, so quick view was unreachable
+   on a phone entirely. Here it is a small permanent button instead — an icon,
+   so it costs the photo almost nothing. */
+@media (hover: none) {
+  .card-quick {
+    inset-inline: auto var(--s2);
+    inset-block-end: var(--s2);
+    width: 36px; height: 36px; padding: 0;
+    opacity: 1; transform: none;
+    color: var(--ink-70);
+    background: color-mix(in srgb, var(--surface) 85%, transparent);
+  }
+  .card-quick svg { display: block; }
+  .card-quick-text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .card-quick:active { scale: 0.88; }
+}
 
 /* ── Category tiles ────────────────────────────────────── */
 .cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
@@ -549,7 +575,11 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
   margin-inline: calc(var(--s4) * -1);
   padding-block: var(--s3) var(--s2);
   background: var(--surface);
+  /* The handle drags the sheet, so it must not also scroll it. */
+  touch-action: none;
+  cursor: grab;
 }
+.modal-head:active { cursor: grabbing; }
 .modal-grab { width: 42px; height: 4px; border-radius: var(--r-full); background: var(--line-strong); }
 .modal-close {
   position: absolute; inset-block-start: 50%; translate: 0 -50%;
@@ -773,11 +803,68 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .panel > .table-scroll { margin-inline: 0; padding-inline: 0; }
 }
 
+/* ── Shared-element navigation ─────────────────────────────
+   The gallery is the destination and claims the name from here; the outgoing
+   card claims it imperatively (see lib/morph.js). Browsers without view
+   transitions ignore all of this and navigate instantly. */
+.gal-main { view-transition-name: product-photo; }
+
+::view-transition-group(product-photo) { animation-duration: 0.34s; }
+::view-transition-old(product-photo),
+::view-transition-new(product-photo) {
+  /* Both boxes are 3:4 crops of the same photo at different sizes; matching
+     the fit keeps the image from stretching while the box travels. */
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── Motion tied to scroll ─────────────────────────────────
+   A phone has no hover, but it always has scroll position. These are the
+   touch counterparts of the desktop hover states.
+   Scroll-driven animations are progress-based, not time-based, so the global
+   reduced-motion rule below cannot switch them off — they are gated here. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) and (max-width: 899px) {
+    /* Not .rail children: a rail scrolls horizontally, and view() measures the
+       block axis, so their progress would never advance off 0% — they would
+       simply never appear. */
+    .grid-products > *, .cats > * {
+      animation: reveal linear both;
+      animation-timeline: view();
+      animation-range: entry 0% entry 42%;
+    }
+    /* `translate`, not `transform`: this animation fills forwards, and a filled
+       animation outranks normal declarations — animating `transform` here would
+       permanently cancel the :active press below. */
+    @keyframes reveal {
+      from { opacity: 0; translate: 0 16px; }
+    }
+
+    /* The banner drifts and swells slightly as it leaves — the parallax that
+       tells you the photo sits behind the page rather than in it. */
+    .hero-art .ph img {
+      animation: hero-drift linear both;
+      animation-timeline: view();
+      animation-range: exit 0% exit 100%;
+    }
+    @keyframes hero-drift {
+      to { transform: scale(1.14) translateY(-5%); }
+    }
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+  /* `*` does not reach the view-transition pseudo-elements, so the page would
+     still slide and morph for someone who asked it not to. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

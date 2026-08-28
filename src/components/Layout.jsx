@@ -1,5 +1,5 @@
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useLayoutEffect, useState } from 'react';
 import { useShop } from '../lib/store';
 import { fa } from '../lib/format';
 
@@ -36,9 +36,23 @@ export default function Layout() {
   const { count, toasts, wish } = useShop();
   const { pathname } = useLocation();
 
-  useEffect(() => {
+  /* Layout effect, so the reset lands inside the same synchronous flush as the
+     route swap. As a passive effect it ran after the view transition had
+     already snapshotted the incoming page, and the morph finished into place
+     only for the page to jump to the top a frame later. */
+  useLayoutEffect(() => {
     window.scrollTo({ top: 0, behavior: 'auto' });
   }, [pathname]);
+
+  // The badge is small and far from the thumb that just tapped "add" — a beat
+  // of movement is what confirms the tap landed.
+  const [pop, setPop] = useState(false);
+  useEffect(() => {
+    if (!count) return undefined;
+    setPop(true);
+    const t = setTimeout(() => setPop(false), 420);
+    return () => clearTimeout(t);
+  }, [count]);
 
   return (
     <>
@@ -76,7 +90,7 @@ export default function Layout() {
             </Link>
             <Link to="/cart" className="icon-btn" aria-label={`سبد خرید، ${count} کالا`}>
               <Icon d={icons.bag} />
-              {count > 0 && <span className="cart-count num">{fa(count)}</span>}
+              {count > 0 && <span className={`cart-count num ${pop ? 'pop' : ''}`}>{fa(count)}</span>}
             </Link>
           </div>
         </div>

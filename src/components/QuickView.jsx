@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Photo } from './States';
 import { ColorPicker, SizePicker, useVariant } from './Buy';
@@ -21,6 +21,25 @@ export default function QuickView({ product, onClose }) {
     };
   }, [onClose]);
 
+  /* The grab handle drew a bar that promised a drag and did nothing. Now it
+     drags: follow the finger down, and let go past the threshold to dismiss.
+     Only the handle is draggable — claiming the whole sheet would fight the
+     scrolling inside it. */
+  const [drag, setDrag] = useState(0);
+  const from = useRef(null);
+
+  const dragStart = (e) => { from.current = e.touches[0].clientY; };
+  const dragMove = (e) => {
+    if (from.current == null) return;
+    // Downward only; an upward pull should not lift the sheet off its edge.
+    setDrag(Math.max(0, e.touches[0].clientY - from.current));
+  };
+  const dragEnd = () => {
+    from.current = null;
+    if (drag > 110) onClose();
+    else setDrag(0);
+  };
+
   const add = () => {
     dispatch({ type: 'add', id: product.id, color: color.name, size });
     toast(`${product.name} — ${color.name}، ${size} به سبد اضافه شد`);
@@ -28,9 +47,25 @@ export default function QuickView({ product, onClose }) {
   };
 
   return (
-    <div className="modal-scrim" onClick={(e) => e.target === e.currentTarget && onClose()}>
-      <div className="modal" role="dialog" aria-modal="true" aria-label={`نگاه سریع ${product.name}`}>
-        <div className="modal-head">
+    <div
+      className="modal-scrim"
+      onClick={(e) => e.target === e.currentTarget && onClose()}
+      style={drag ? { background: `color-mix(in srgb, var(--ink) ${Math.max(8, 55 - drag * 0.3)}%, transparent)` } : undefined}
+    >
+      <div
+        className="modal"
+        role="dialog"
+        aria-modal="true"
+        aria-label={`نگاه سریع ${product.name}`}
+        style={drag ? { transform: `translateY(${drag}px)`, transition: 'none', animation: 'none' } : undefined}
+      >
+        <div
+          className="modal-head"
+          onTouchStart={dragStart}
+          onTouchMove={dragMove}
+          onTouchEnd={dragEnd}
+          onTouchCancel={dragEnd}
+        >
           <div className="modal-grab" />
           <button className="modal-close" onClick={onClose} aria-label="بستن">✕</button>
         </div>
