@@ -9,11 +9,10 @@
    swatch→image swap real rather than a tint filter. */
 
 /* BASE_URL keeps this right under GitHub Pages, which serves the site from
-   /tirang-shop/ rather than the domain root.
-   The extension follows what fetch-photos.mjs wrote: Pexels' compressor
-   returns JPEG for everything except the two shots requested as PNG. */
-const px = (id, ext = 'jpeg') =>
-  `${import.meta.env.BASE_URL}photos/${id}.${ext === 'png' ? 'png' : 'jpg'}`;
+   /tirang-shop/ rather than the domain root. fetch-photos.mjs asks Pexels for
+   JPEG, so every vendored file is a .jpg regardless of its source format —
+   `ext` now only picks which original to fetch, not what lands on disk. */
+const px = (id) => `${import.meta.env.BASE_URL}photos/${id}.jpg`;
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
