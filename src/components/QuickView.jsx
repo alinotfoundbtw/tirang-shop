@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { Photo } from './States';
 import { ColorPicker, SizePicker, useVariant } from './Buy';
 import { useShop } from '../lib/store';
+import { trapFocus } from '../lib/focus';
 import { toman, fa } from '../lib/format';
 
 /** Buy from the grid without losing your place in it. */
@@ -15,9 +16,11 @@ export default function QuickView({ product, onClose }) {
     document.body.style.overflow = 'hidden';
     const key = (e) => e.key === 'Escape' && onClose();
     window.addEventListener('keydown', key);
+    const release = trapFocus(sheetRef.current);
     return () => {
       document.body.style.overflow = prev;
       window.removeEventListener('keydown', key);
+      release();
     };
   }, [onClose]);
 
@@ -27,6 +30,7 @@ export default function QuickView({ product, onClose }) {
      scrolling inside it. */
   const [drag, setDrag] = useState(0);
   const from = useRef(null);
+  const sheetRef = useRef(null);
 
   const dragStart = (e) => { from.current = e.touches[0].clientY; };
   const dragMove = (e) => {
@@ -54,6 +58,7 @@ export default function QuickView({ product, onClose }) {
     >
       <div
         className="modal"
+        ref={sheetRef}
         role="dialog"
         aria-modal="true"
         aria-label={`نگاه سریع ${product.name}`}

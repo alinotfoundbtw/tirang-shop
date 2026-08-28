@@ -54,7 +54,7 @@ export default function Profile() {
           <h1>{acc.user.name}</h1>
           <p className="muted num">{fa(acc.user.phone)}</p>
         </div>
-        <button className="btn btn-ghost" onClick={() => { acc.signOut(); toast('خارج شدی'); }}>
+        <button className="btn btn-ghost" onClick={() => { acc.signOut(); toast('خارج شدی', 'warn'); }}>
           خروج
         </button>
       </header>
@@ -183,7 +183,7 @@ function AddressTab({ acc, toast }) {
                 <button
                   className="btn-quiet danger"
                   style={{ fontSize: 'var(--t-xs)' }}
-                  onClick={() => { acc.removeAddress(a.id); toast('آدرس حذف شد'); }}
+                  onClick={() => { acc.removeAddress(a.id); toast('آدرس حذف شد', 'warn'); }}
                 >
                   <Icon d={art.trash} size={14} />
                   حذف

@@ -4,7 +4,10 @@ import { BrowserRouter } from 'react-router-dom';
 import { ShopProvider } from './lib/store';
 import { AccountProvider } from './lib/account';
 import App from './App';
+import { initEggs } from './lib/eggs';
 import './styles/app.css';
+
+initEggs();
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>

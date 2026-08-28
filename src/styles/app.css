@@ -546,7 +546,12 @@ textarea.field { min-height: 96px; resize: vertical; }
 }
 .card-swatches > .muted {
   min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  margin-inline-start: 2px;
 }
+/* The colour count is the quieter half of the label and drops first when the
+   card is narrow. */
+.card-colour small { color: var(--ink-45); }
+@media (max-width: 380px) { .card-colour small { display: none; } }
 .sw {
   width: 20px; height: 20px; border-radius: var(--r-full);
   border: 1px solid var(--line-strong); position: relative;
@@ -1537,6 +1542,104 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 
 /* ── Landscape phone ───────────────────────────────────────
    Short and wide: a hero sized for a portrait screen would fill the whole of it. */
+/* ── Easter eggs ───────────────────────────────────────────
+   See lib/eggs.js. Both of these are driven from outside React: one by an
+   element the script appends, one by a data attribute on <html>. Deleting
+   the import in main.jsx leaves nothing behind but these rules.
+   ───────────────────────────────────────────────────────── */
+.egg-rain {
+  position: fixed; inset: 0; z-index: 95;
+  pointer-events: none; overflow: hidden;
+}
+.egg-rain svg {
+  position: absolute; inset-block-start: -12vh;
+  width: var(--size); height: var(--size);
+  color: var(--wine);
+  animation-name: egg-fall;
+  animation-timing-function: linear;
+  animation-fill-mode: both;
+}
+@keyframes egg-fall {
+  from { transform: translateY(0) rotate(0deg); }
+  to { transform: translateY(118vh) rotate(var(--spin)); }
+}
+@media (prefers-reduced-motion: reduce) {
+  /* Still a shower, just one that stays put and fades. */
+  .egg-rain svg { animation-name: egg-settle; animation-duration: 0.9s !important; }
+  @keyframes egg-settle { from { opacity: 0; transform: translateY(40vh); } to { opacity: 0; transform: translateY(46vh); } }
+}
+
+/* Seven taps on the logo: the pattern pieces get marked, the way they are
+   before anything is cut. */
+[data-egg='seams'] .card,
+[data-egg='seams'] .panel,
+[data-egg='seams'] .cat,
+[data-egg='seams'] .hero-art,
+[data-egg='seams'] .track,
+[data-egg='seams'] .quiz-card,
+[data-egg='seams'] .review-summary,
+[data-egg='seams'] .auth-card,
+[data-egg='seams'] .footer {
+  outline: 1.5px dashed color-mix(in srgb, var(--cherry) 70%, transparent);
+  outline-offset: -5px;
+}
+[data-egg='seams'] .wrap { position: relative; }
+[data-egg='seams'] .wrap::after {
+  content: '';
+  position: absolute; inset-block: 0; inset-inline-start: 0;
+  border-inline-start: 1px dashed color-mix(in srgb, var(--wine) 45%, transparent);
+  pointer-events: none;
+}
+[data-egg='seams'] .footer::before {
+  content: 'حالت اتود — برای بستن Esc';
+  position: absolute; inset-inline-end: var(--s4); margin-block-start: calc(var(--s4) * -1);
+  font-size: 10px; letter-spacing: 0.08em;
+  color: var(--cherry);
+}
+[data-egg='seams'] .footer { position: relative; }
+
+/* ── Header, once you have scrolled ────────────────────────
+   A hairline border is enough while the page is at the top; past that the
+   header is floating over content and needs to say so. */
+.header {
+  transition: box-shadow 0.25s var(--ease), background 0.25s var(--ease);
+}
+.header.floating {
+  box-shadow: 0 6px 20px -14px rgba(20, 22, 27, 0.55);
+  background: color-mix(in srgb, var(--paper) 94%, transparent);
+}
+.scroll-sentinel { position: absolute; inset-block-start: 0; height: 1px; width: 1px; }
+
+/* ── Toasts, with a mark for what happened ─────────────── */
+.toast { display: flex; align-items: center; gap: var(--s2); }
+.toast svg { flex: none; }
+.toast-ok svg { color: #6ee7a8; }
+.toast-warn svg { color: #ffc46b; }
+
+/* ── The heart, when you mean it ───────────────────────── */
+@keyframes heart-burst {
+  0% { transform: scale(1); }
+  40% { transform: scale(1.45); }
+  70% { transform: scale(0.92); }
+  100% { transform: scale(1); }
+}
+.wish[aria-pressed='true'] svg { animation: heart-burst 0.42s var(--ease); }
+
+/* ── Micro-polish ──────────────────────────────────────── */
+:root { caret-color: var(--wine); }
+::selection { background: color-mix(in srgb, var(--wine) 22%, transparent); color: var(--ink); }
+/* A tabular figure that changes should not shuffle the row it sits in. */
+.num { font-variant-numeric: tabular-nums; }
+/* Anything that scrolls under the sticky header gets clearance when linked to. */
+[id] { scroll-margin-block-start: calc(var(--header-h) + var(--s4)); }
+/* Stops a long unbroken word — a URL, a slug — from widening a card. */
+.card-title, .qs-name b, .result-body b, .review-body { overflow-wrap: anywhere; }
+/* The first paint should arrive rather than appear. */
+@media (prefers-reduced-motion: no-preference) {
+  #root { animation: boot 0.4s var(--ease) both; }
+  @keyframes boot { from { opacity: 0; } }
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (min-width: 700px) {
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }

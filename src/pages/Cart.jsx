@@ -50,7 +50,7 @@ export default function Cart() {
                   <button
                     className="btn-quiet"
                     style={{ fontSize: 'var(--t-xs)' }}
-                    onClick={() => { dispatch({ type: 'remove', key: l.key }); toast('از سبد حذف شد'); }}
+                    onClick={() => { dispatch({ type: 'remove', key: l.key }); toast('از سبد حذف شد', 'warn'); }}
                   >
                     حذف
                   </button>
@@ -79,7 +79,7 @@ export default function Cart() {
       <button
         className="btn btn-primary btn-block"
         style={{ marginBlockStart: 'var(--s4)' }}
-        onClick={() => toast('اینجا به درگاه پرداخت وصل می‌شود')}
+        onClick={() => toast('اینجا به درگاه پرداخت وصل می‌شود', 'warn')}
       >
         ادامهٔ خرید و پرداخت
       </button>

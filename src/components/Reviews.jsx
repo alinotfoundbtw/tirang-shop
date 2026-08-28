@@ -157,7 +157,7 @@ function ReviewForm({ product, mine }) {
             {mine ? 'ویرایش نظر' : 'ثبت نظر'}
           </button>
           {mine && (
-            <button className="btn-quiet" onClick={() => { removeReview(product.id); toast('نظرت حذف شد'); }}>
+            <button className="btn-quiet" onClick={() => { removeReview(product.id); toast('نظرت حذف شد', 'warn'); }}>
               حذف نظر
             </button>
           )}

@@ -92,9 +92,12 @@ export function ShopProvider({ children }) {
     });
   }, []);
 
-  const toast = useCallback((text) => {
+  /** `kind` is optional and defaults to 'ok'; every existing caller passes
+   *  only text, and a toast that says nothing about what happened is still
+   *  better than one that claims the wrong thing. */
+  const toast = useCallback((text, kind = 'ok') => {
     const id = Math.random().toString(36).slice(2);
-    setToasts((t) => [...t, { id, text }]);
+    setToasts((t) => [...t, { id, text, kind }]);
     setTimeout(() => setToasts((t) => t.filter((x) => x.id !== id)), 2600);
   }, []);
 
@@ -102,7 +105,7 @@ export function ShopProvider({ children }) {
     (id) =>
       setWish((w) => {
         const on = w.includes(id);
-        toast(on ? 'از علاقه‌مندی‌ها حذف شد' : 'به علاقه‌مندی‌ها اضافه شد');
+        toast(on ? 'از علاقه‌مندی‌ها حذف شد' : 'به علاقه‌مندی‌ها اضافه شد', on ? 'warn' : 'ok');
         return on ? w.filter((x) => x !== id) : [id, ...w];
       }),
     [toast]

@@ -1,4 +1,5 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
-  <rect width="32" height="32" rx="7" fill="#7A1F2B"/>
-  <path d="M4 21 q6 -12 12 0 q6 -12 12 0" fill="none" stroke="#FBF7F5" stroke-width="3" stroke-linecap="round"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="تیرنگ">
+  <rect width="32" height="32" rx="7" fill="#2B45E0"/>
+  <path d="M11.6 6.4 6.6 8.9 4.4 13.6l3.4 1.7v9.3h16.4v-9.3l3.4-1.7-2.2-4.7-5-2.5a4.5 4.5 0 0 1-8.8 0Z"
+        fill="none" stroke="#F8F7F4" stroke-width="2.2" stroke-linejoin="round"/>
 </svg>

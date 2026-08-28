@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { search, searchFaq } from '../lib/rag';
+import { trapFocus } from '../lib/focus';
 import { categories } from '../data/products';
 import { toman, fa } from '../lib/format';
 
@@ -29,6 +30,7 @@ export default function QuickSearch() {
   const [q, setQ] = useState('');
   const [cursor, setCursor] = useState(0);
   const inputRef = useRef(null);
+  const panelRef = useRef(null);
   const navigate = useNavigate();
 
   const results = useMemo(() => {
@@ -52,10 +54,12 @@ export default function QuickSearch() {
     window.addEventListener('keydown', onKey);
     const prev = document.body.style.overflow;
     document.body.style.overflow = 'hidden';
+    const release = trapFocus(panelRef.current);
     return () => {
       clearTimeout(t);
       window.removeEventListener('keydown', onKey);
       document.body.style.overflow = prev;
+      release();
     };
   }, [open, rows.length]);
 
@@ -80,7 +84,7 @@ export default function QuickSearch() {
 
       {open && (
         <div className="qs-scrim" onClick={(e) => e.target === e.currentTarget && close()}>
-          <div className="qs" role="dialog" aria-modal="true" aria-label="جست‌وجو در فروشگاه">
+          <div className="qs" ref={panelRef} role="dialog" aria-modal="true" aria-label="جست‌وجو در فروشگاه">
             <form className="qs-bar" onSubmit={submit}>
               <Icon d={art.search} size={19} />
               <input

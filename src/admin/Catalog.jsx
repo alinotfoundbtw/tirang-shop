@@ -23,7 +23,7 @@ export function Catalog() {
   const [q, setQ] = useState('');
 
   const save = () => {
-    if (!form.name.trim() || !form.price) return toast('اسم و قیمت لازم است');
+    if (!form.name.trim() || !form.price) return toast('اسم و قیمت لازم است', 'warn');
     const stock = { S: 5, M: 8, L: 8, XL: 4, XXL: 2 };
     const p = {
       id: `n${Date.now()}`,

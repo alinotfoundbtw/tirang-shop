@@ -79,7 +79,10 @@ export default function ProductCard({ product: p, eager, onQuickView }) {
                 onClick={() => setCi(i)}
               />
             ))}
-            <span className="muted" style={{ fontSize: 'var(--t-xs)', marginInlineStart: 2 }}>{color.name}</span>
+            <span className="muted card-colour" style={{ fontSize: 'var(--t-xs)' }}>
+              {color.name}
+              <small> · {fa(p.colors.length)} رنگ</small>
+            </span>
           </div>
         )}
 
