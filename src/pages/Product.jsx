@@ -3,6 +3,8 @@ import { Link, useParams } from 'react-router-dom';
 import { products, categories } from '../data/products';
 import Gallery from '../components/Gallery';
 import ProductCard from '../components/ProductCard';
+import Reviews from '../components/Reviews';
+import { reviewSummary } from '../data/reviews';
 import { ColorPicker, SizePicker, SizeFinder, useVariant } from '../components/Buy';
 import { Loader, EmptyState } from '../components/States';
 import { useShop, useAsync } from '../lib/store';
@@ -53,6 +55,11 @@ function Detail({ p }) {
     return () => io.disconnect();
   }, []);
 
+  /* One rating on the page: the same summary feeds the line under the title,
+     the section at the bottom and the structured data. Declared above useSeo
+     because that call reads it while building the JSON-LD. */
+  const rating = reviewSummary(p.id);
+
   useSeo({
     title: p.name,
     description: p.bio.slice(0, 155),
@@ -61,7 +68,7 @@ function Detail({ p }) {
     jsonLd: {
       '@context': 'https://schema.org',
       '@graph': [
-        productLd(p, `${window.location.origin}/p/${p.slug}`),
+        productLd(p, `${window.location.origin}/p/${p.slug}`, rating),
         breadcrumbLd([
           { name: 'خانه', path: '/' },
           { name: categories.find((c) => c.slug === p.category)?.name || 'محصولات', path: `/products?cat=${p.category}` },
@@ -104,7 +111,15 @@ function Detail({ p }) {
           </div>
 
           <p className="muted" style={{ fontSize: 'var(--t-sm)' }}>
-            ⭐ {fa(p.rating.toFixed(1).replace('.', '٫'))} · {fa(p.sales)} خرید · {p.model}
+            {rating && (
+              <>
+                <a href="#reviews" className="link-more">
+                  ⭐ {fa(rating.average.toFixed(1).replace('.', '٫'))} ({fa(rating.count)} نظر)
+                </a>
+                {' · '}
+              </>
+            )}
+            {fa(p.sales)} خرید · {p.model}
           </p>
 
           <div className="price-now num">
@@ -187,6 +202,8 @@ function Detail({ p }) {
           </div>
         </div>
       </div>
+
+      <Reviews product={p} />
 
       <section className="section">
         <div className="section-head"><h2>شبیه همین</h2></div>

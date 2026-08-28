@@ -20,6 +20,12 @@
   --line: color-mix(in srgb, var(--ink) 12%, var(--paper));
   --line-strong: color-mix(in srgb, var(--ink) 22%, var(--paper));
   --wine-soft: color-mix(in srgb, var(--wine) 10%, var(--paper));
+  /* Overlays must stay dark in both themes. Built from --ink they inverted:
+     in dark mode --ink is near-white, so every scrim became a white veil over
+     the thing it was meant to recede behind. */
+  --scrim: rgba(16, 17, 22, 0.55);
+  --scrim-deep: rgba(10, 11, 14, 0.94);
+  --scrim-soft: rgba(16, 17, 22, 0.45);
   --cherry-soft: color-mix(in srgb, var(--cherry) 14%, var(--paper));
   --surface: #fff;
 
@@ -100,6 +106,9 @@
   --sand: #2a2e3f;
   --surface: #181a21;
   --line: color-mix(in srgb, var(--ink) 14%, var(--paper));
+  --scrim: rgba(0, 0, 0, 0.66);
+  --scrim-deep: rgba(0, 0, 0, 0.95);
+  --scrim-soft: rgba(0, 0, 0, 0.58);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -112,5 +121,8 @@
     --sand: #2a2e3f;
     --surface: #181a21;
     --line: color-mix(in srgb, var(--ink) 14%, var(--paper));
+    --scrim: rgba(0, 0, 0, 0.66);
+    --scrim-deep: rgba(0, 0, 0, 0.95);
+    --scrim-soft: rgba(0, 0, 0, 0.58);
   }
 }

@@ -131,6 +131,33 @@ select.field { -webkit-appearance: none; appearance: none; padding-inline-end: v
   background-image: linear-gradient(45deg, transparent 50%, var(--ink-45) 50%), linear-gradient(135deg, var(--ink-45) 50%, transparent 50%);
   background-position: calc(var(--s4) + 5px) calc(50% + 2px), var(--s4) calc(50% + 2px);
   background-size: 5px 5px; background-repeat: no-repeat; }
+
+/* A select styled as a pill, matching the filter chips above it rather than
+   sitting among them as the one piece of raw browser chrome. The native
+   element is kept — its menu is the one part of a dropdown a phone renders
+   better than any div ever will. */
+.sortbox { position: relative; display: inline-flex; align-items: center; flex: none; }
+.sortbox select {
+  -webkit-appearance: none; appearance: none;
+  min-height: 40px; padding-inline: var(--s4) var(--s7);
+  border-radius: var(--r-full); border: 1px solid var(--line-strong);
+  background: var(--surface); color: var(--ink);
+  font-size: var(--t-sm); font-weight: 600;
+  cursor: pointer; width: auto;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.sortbox select:hover { border-color: var(--ink); }
+.sortbox select:focus-visible { outline: none; border-color: var(--wine); box-shadow: 0 0 0 3px var(--wine-soft); }
+.sortbox-art {
+  position: absolute; inset-inline-start: var(--s3); inset-block-start: 50%;
+  translate: 0 -50%; pointer-events: none; color: var(--ink-45);
+  display: grid; place-items: center;
+}
+.sortbox-label {
+  position: absolute; inset-inline-end: var(--s4); inset-block-start: -7px;
+  background: var(--paper); padding-inline: 5px;
+  font-size: 10px; color: var(--ink-45); pointer-events: none;
+}
 textarea.field { min-height: 96px; resize: vertical; }
 .label { font-size: var(--t-sm); color: var(--ink-70); margin-block-end: var(--s1); display: block; }
 
@@ -205,7 +232,7 @@ textarea.field { min-height: 96px; resize: vertical; }
    ───────────────────────────────────────────────────────── */
 .qs-scrim {
   position: fixed; inset: 0; z-index: 70;
-  background: color-mix(in srgb, var(--ink) 45%, transparent);
+  background: var(--scrim-soft);
   backdrop-filter: blur(3px);
   display: grid; justify-items: center; align-items: start;
   padding: calc(var(--sat) + var(--s3)) calc(var(--gutter) + var(--sar)) var(--s4) calc(var(--gutter) + var(--sal));
@@ -568,16 +595,39 @@ textarea.field { min-height: 96px; resize: vertical; }
   .card-quick:active { scale: 0.88; }
 }
 
-/* ── Category tiles ────────────────────────────────────── */
+/* ── Category tiles ────────────────────────────────────────
+   Each tile carries its own drawn cut (components/CategoryMark.jsx) — the
+   same shirt with one thing changed, so the six read as a set. The mark is
+   oversized and clipped at the corner: decoration that shows the product
+   rather than a generic icon sitting in a box.
+   ───────────────────────────────────────────────────────── */
 .cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
 .cat {
-  padding: var(--s4); border-radius: var(--r-md); background: var(--blush);
-  border: 1px solid transparent; transition: 0.22s var(--ease);
-  display: flex; flex-direction: column; gap: 2px; min-height: 92px; justify-content: flex-end;
+  position: relative; overflow: hidden; isolation: isolate;
+  padding: var(--s4); border-radius: var(--r-md);
+  background: var(--blush); border: 1px solid transparent;
+  transition: border-color 0.22s var(--ease), background 0.22s var(--ease), transform 0.22s var(--ease);
+  display: flex; flex-direction: column; gap: 2px;
+  min-height: 116px; justify-content: flex-end;
+}
+.cat-mark {
+  position: absolute; z-index: -1;
+  inset-block-start: -6px; inset-inline-end: -10px;
+  color: var(--ink);
+  opacity: 0.14;
+  transform: rotate(-8deg) scale(1.7); transform-origin: top right;
+  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease);
+  pointer-events: none;
 }
 .cat:hover { border-color: var(--wine); background: var(--wine-soft); }
+.cat:hover .cat-mark { opacity: 0.3; color: var(--wine); transform: rotate(-4deg) scale(1.8); }
+.cat:active { transform: scale(0.985); }
 .cat b { font-family: var(--font-display); font-size: 1.05rem; }
-.cat span { font-size: var(--t-xs); color: var(--ink-45); }
+.cat-note { font-size: var(--t-xs); color: var(--ink-45); }
+.cat-count {
+  font-size: 10px; color: var(--wine); font-weight: 600;
+  margin-block-start: var(--s2);
+}
 
 /* ── Gallery: zoom lens + lightbox ─────────────────────── */
 .gallery { display: grid; gap: var(--s2); }
@@ -596,7 +646,7 @@ textarea.field { min-height: 96px; resize: vertical; }
 .gal-main img { transition: transform 0.3s var(--ease); transform-origin: center; will-change: transform; }
 .gal-hint {
   position: absolute; inset-block-end: var(--s3); inset-inline-start: var(--s3); z-index: 2;
-  background: color-mix(in srgb, var(--ink) 78%, transparent); color: var(--paper);
+  background: var(--scrim); color: #fff;
   font-size: var(--t-xs); padding: 4px 10px; border-radius: var(--r-full);
   display: flex; gap: 5px; align-items: center; pointer-events: none;
   opacity: 0.9; transition: opacity 0.2s;
@@ -626,7 +676,7 @@ textarea.field { min-height: 96px; resize: vertical; }
 /* Lightbox — full screen, pinch/drag pan, swipe between shots */
 .lightbox {
   position: fixed; inset: 0; z-index: 90;
-  background: color-mix(in srgb, var(--ink) 94%, transparent);
+  background: var(--scrim-deep);
   display: grid; grid-template-rows: auto 1fr auto;
   animation: fade 0.2s var(--ease);
   padding: var(--sat) var(--sar) var(--sab) var(--sal);
@@ -710,7 +760,7 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 /* ── Quick view ────────────────────────────────────────── */
 .modal-scrim {
   position: fixed; inset: 0; z-index: 80;
-  background: color-mix(in srgb, var(--ink) 55%, transparent);
+  background: var(--scrim);
   display: grid; place-items: end center; animation: fade 0.2s var(--ease);
   overscroll-behavior: contain;
 }
@@ -780,6 +830,16 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 .totals .sum { border-block-start: 1px dashed var(--line-strong); padding-block-start: var(--s3); margin-block-start: var(--s2); font-size: 1.05rem; font-weight: 700; }
 .progress { height: 6px; border-radius: var(--r-full); background: var(--line); overflow: hidden; margin-block: var(--s2); }
 .progress i { display: block; height: 100%; background: var(--wine); border-radius: var(--r-full); transition: width 0.5s var(--ease); }
+
+/* Horizontal chip scroller. Shared by the product filters and the brand
+   editor; it outlived the chat page it was first written for. */
+.suggestions {
+  display: flex; gap: var(--s2); overflow-x: auto; padding-block-end: var(--s2);
+  scrollbar-width: none; -webkit-overflow-scrolling: touch;
+  overscroll-behavior-x: contain;
+}
+.suggestions::-webkit-scrollbar { display: none; }
+.suggestions > * { flex: none; }
 
 /* ── Assistant console ─────────────────────────────────────
    The page asks the questions instead of waiting to be typed at, so it is
@@ -935,6 +995,55 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 .state p { color: var(--ink-45); max-width: 34ch; }
 .loader path { fill: none; stroke: var(--wine); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 260; stroke-dashoffset: 260; animation: trace 1.8s var(--ease) infinite; }
 @keyframes trace { 0% { stroke-dashoffset: 260; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -260; } }
+
+/* ── Reviews ───────────────────────────────────────────────
+   Every number here is computed from the entries in data/reviews.js, so the
+   average, the bars and the count cannot drift apart from the text below.
+   ───────────────────────────────────────────────────────── */
+.reviews { scroll-margin-block-start: calc(var(--header-h) + var(--s5)); }
+.stars { display: inline-flex; gap: 1px; vertical-align: middle; }
+.star { fill: var(--line-strong); }
+.star.on { fill: #f0a92b; }
+
+.review-summary {
+  display: grid; gap: var(--s4);
+  padding: var(--s4); margin-block-end: var(--s5);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface);
+}
+.review-score { display: grid; justify-items: center; gap: 4px; text-align: center; }
+.review-score b { font-family: var(--font-display); font-size: 2.6rem; line-height: 1; }
+.review-score small { font-size: var(--t-xs); color: var(--ink-45); }
+
+.review-bars { list-style: none; padding: 0; display: grid; gap: 6px; align-content: center; }
+.review-bars li { display: grid; grid-template-columns: auto 1fr auto; gap: var(--s2); align-items: center; font-size: var(--t-xs); color: var(--ink-45); }
+.review-track { height: 6px; border-radius: var(--r-full); background: var(--blush); overflow: hidden; }
+.review-track i { display: block; height: 100%; background: #f0a92b; border-radius: var(--r-full); transition: width 0.5s var(--ease); }
+.review-n { min-width: 1.5em; text-align: end; }
+
+.review-list { list-style: none; padding: 0; display: grid; gap: var(--s4); }
+.review-list li { padding-block-end: var(--s4); border-block-end: 1px solid var(--line); }
+.review-list li:last-child { border-block-end: 0; }
+.review-head { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); margin-block-end: var(--s2); }
+.review-who { display: inline-flex; align-items: center; gap: var(--s2); min-width: 0; }
+.review-avatar {
+  width: 32px; height: 32px; border-radius: var(--r-full); flex: none;
+  display: grid; place-items: center;
+  background: var(--sand); color: var(--wine);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
+}
+.review-who b { font-size: var(--t-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.review-body { font-size: var(--t-sm); line-height: 1.8; color: var(--ink-70); }
+.review-meta { font-size: var(--t-xs); color: var(--ink-45); margin-block-start: var(--s2); }
+.review-note {
+  margin-block-start: var(--s4); font-size: var(--t-xs); color: var(--ink-45);
+  text-align: center;
+}
+
+@media (min-width: 560px) {
+  .review-summary { grid-template-columns: auto 1fr; gap: var(--s6); align-items: center; }
+  .review-score { border-inline-end: 1px solid var(--line); padding-inline-end: var(--s6); }
+}
 
 /* ── Toast ─────────────────────────────────────────────── */
 .toasts {
@@ -1158,7 +1267,7 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 @media (min-width: 900px) {
   /* Past the tab bar, inputs can go back to the body size — desktop Safari
      has no zoom-on-focus behaviour to defend against. */
-  .field, .bot-form input { font-size: var(--t-body); }
+  .field { font-size: var(--t-body); }
   .nav-desktop { display: flex; }
   .tabbar { display: none; }
   .buy-sticky { display: none; }
@@ -1208,7 +1317,6 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .hero-now-price { background: var(--sand); color: var(--wine); }
   .hero-dots button { background: var(--line-strong); }
   .hero-dots button.on { background: var(--ink); }
-  .bot { min-height: 0; }
 }
 
 @supports (animation-timeline: view()) {

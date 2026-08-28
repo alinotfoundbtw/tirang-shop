@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categories, products } from '../data/products';
 import Hero from '../components/Hero';
+import CategoryMark from '../components/CategoryMark';
 import ProductCard from '../components/ProductCard';
 import QuickView from '../components/QuickView';
 import { useSeo } from '../lib/seo';
+import { fa } from '../lib/format';
 
 export default function Home() {
   useSeo({
@@ -27,8 +29,12 @@ export default function Home() {
         <div className="cats">
           {categories.map((c) => (
             <Link key={c.slug} to={`/products?cat=${c.slug}`} className="cat">
+              <span className="cat-mark"><CategoryMark slug={c.slug} /></span>
               <b>{c.name}</b>
-              <span>{c.note}</span>
+              <span className="cat-note">{c.note}</span>
+              <span className="cat-count num">
+                {fa(products.filter((p) => p.category === c.slug).length)} مدل
+              </span>
             </Link>
           ))}
         </div>

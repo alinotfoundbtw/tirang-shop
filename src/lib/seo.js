@@ -55,7 +55,12 @@ export function useSeo({ title, description, image, path, jsonLd, noindex }) {
   }, [title, description, image, path, noindex, JSON.stringify(jsonLd)]);
 }
 
-export const productLd = (p, url) => ({
+/* `rating` is the summary computed from the review entries actually rendered
+   on the page. It used to be { p.rating, reviewCount: p.sales } — sales are not
+   reviews, and structured data that claims a rating the page does not show is a
+   claim made to search engines and nobody else. Omitted entirely when there are
+   no reviews to back it. */
+export const productLd = (p, url, rating) => ({
   '@context': 'https://schema.org',
   '@type': 'Product',
   name: p.name,
@@ -65,7 +70,15 @@ export const productLd = (p, url) => ({
   color: p.colors?.map((c) => c.name).join('، '),
   size: p.sizes?.join('، '),
   brand: { '@type': 'Brand', name: SITE },
-  aggregateRating: { '@type': 'AggregateRating', ratingValue: p.rating, reviewCount: p.sales },
+  ...(rating?.count
+    ? {
+        aggregateRating: {
+          '@type': 'AggregateRating',
+          ratingValue: Number(rating.average.toFixed(1)),
+          reviewCount: rating.count,
+        },
+      }
+    : {}),
   offers: {
     '@type': 'Offer',
     price: p.price,

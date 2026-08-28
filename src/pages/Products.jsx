@@ -149,11 +149,19 @@ export default function Products() {
               پاک‌کردن فیلترها
             </button>
           )}
-          <select className="field" style={{ width: 'auto' }} value={sort} onChange={(e) => setParam('sort', e.target.value)} aria-label="ترتیب نمایش">
-            {SORTS.map(([v, l]) => (
-              <option key={v} value={v}>{l}</option>
-            ))}
-          </select>
+          <span className="sortbox">
+            <span className="sortbox-art" aria-hidden="true">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M7 5v14l-3.5-3.5M17 19V5l3.5 3.5" />
+              </svg>
+            </span>
+            <span className="sortbox-label">ترتیب</span>
+            <select value={sort} onChange={(e) => setParam('sort', e.target.value)} aria-label="ترتیب نمایش">
+              {SORTS.map(([v, l]) => (
+                <option key={v} value={v}>{l}</option>
+              ))}
+            </select>
+          </span>
         </div>
       </div>
 
