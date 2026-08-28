@@ -7,3 +7,4 @@ dist/
 
 # Stray directory from a failed brace-expansion mkdir on Windows
 {src/
+.candidates/
