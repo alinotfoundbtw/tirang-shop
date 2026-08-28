@@ -15,7 +15,7 @@ export default function Admin() {
     <div className="admin">
       <aside className="admin-side">
         <div className="row between" style={{ marginBlockEnd: 'var(--s4)' }}>
-          <span className="logo" style={{ fontSize: '1.2rem' }}>رج</span>
+          <Link to="/" className="logo" style={{ fontSize: '1.2rem' }}>تیرنگ</Link>
           <Link to="/" className="muted" style={{ fontSize: 'var(--t-xs)' }}>
             دیدن سایت ↗
           </Link>

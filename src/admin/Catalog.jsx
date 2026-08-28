@@ -1,8 +1,17 @@
 import { useState } from 'react';
 import { products as seed, categories, orders as seedOrders } from '../data/products';
 import { toman, fa } from '../lib/format';
+import { normalize } from '../lib/rag';
 import { useShop } from '../lib/store';
 import { EmptyState } from '../components/States';
+
+/* One definition of an empty form, because there used to be two and they
+   disagreed. The reset wrote { category: 'shal', stock: '1' } — a category
+   slug this shop does not have, and two fields the inputs are not bound to,
+   while dropping the `fit` and `gsm` they are. After saving one product the
+   category select fell blank and React switched those two inputs from
+   controlled to uncontrolled. */
+const BLANK = { name: '', price: '', category: 'basic', fit: 'رگولار', gsm: '190', bio: '' };
 
 /* Adding a product is three fields and a save. Everything else has a sane
    default the owner can change later — a shop owner abandons a 20-field form. */
@@ -10,7 +19,7 @@ export function Catalog() {
   const { toast } = useShop();
   const [list, setList] = useState(seed);
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState({ name: '', price: '', category: 'basic', fit: 'رگولار', gsm: '190', bio: '' });
+  const [form, setForm] = useState(BLANK);
   const [q, setQ] = useState('');
 
   const save = () => {
@@ -43,7 +52,7 @@ export function Catalog() {
       tags: ['جدید'],
     };
     setList([p, ...list]);
-    setForm({ name: '', price: '', category: 'shal', stock: '1', bio: '' });
+    setForm(BLANK);
     setOpen(false);
     toast(`«${p.name}» اضافه شد`);
   };
@@ -51,7 +60,10 @@ export function Catalog() {
   const setStock = (id, by) =>
     setList((l) => l.map((p) => (p.id === id ? { ...p, stock: Math.max(0, p.stock + by) } : p)));
 
-  const shown = list.filter((p) => p.name.includes(q.trim()));
+  const needle = normalize(q);
+  const shown = needle
+    ? list.filter((p) => normalize(`${p.name} ${p.subtitle} ${p.tags.join(' ')}`).includes(needle))
+    : list;
 
   return (
     <>
@@ -106,7 +118,15 @@ export function Catalog() {
       )}
 
       <div className="panel">
-        <input className="field" placeholder="جست‌وجوی محصول" value={q} onChange={(e) => setQ(e.target.value)} style={{ marginBlockEnd: 'var(--s4)' }} />
+        <input
+          className="field"
+          type="search"
+          aria-label="جست‌وجوی محصول"
+          placeholder="جست‌وجوی محصول"
+          value={q}
+          onChange={(e) => setQ(e.target.value)}
+          style={{ marginBlockEnd: 'var(--s4)' }}
+        />
         {shown.length === 0 ? (
           <EmptyState title="محصولی با این اسم نیست" body="اسم دیگری را امتحان کنید." />
         ) : (
@@ -145,15 +165,15 @@ const STATUS = { paid: ['پرداخت شده', 'paid'], sent: ['ارسال شد�
 export function Orders() {
   const [rows, setRows] = useState(seedOrders);
   const { toast } = useShop();
-  const advance = (id) =>
-    setRows((r) =>
-      r.map((o) => {
-        if (o.id !== id) return o;
-        const next = o.status === 'wait' ? 'paid' : 'sent';
-        toast(`سفارش ${id} → ${STATUS[next][0]}`);
-        return { ...o, status: next };
-      })
-    );
+  const advance = (id) => {
+    const order = rows.find((o) => o.id === id);
+    if (!order || order.status === 'sent') return;
+    const next = order.status === 'wait' ? 'paid' : 'sent';
+    // Outside the updater on purpose: an updater has to be pure, and React 18
+    // runs it twice in development — which fired this toast twice per click.
+    setRows((r) => r.map((o) => (o.id === id ? { ...o, status: next } : o)));
+    toast(`سفارش ${id} → ${STATUS[next][0]}`);
+  };
 
   const revenue = rows.filter((o) => o.status !== 'wait').reduce((s, o) => s + o.total, 0);
 
@@ -167,7 +187,7 @@ export function Orders() {
         <div className="table-scroll">
           <table>
             <thead>
-              <tr><th>شماره</th><th>مشتری</th><th>شهر</th><th>مبلغ</th><th>وضعیت</th><th></th></tr>
+              <tr><th>شماره</th><th>مشتری</th><th>شهر</th><th>مبلغ</th><th>وضعیت</th><th><span className="sr">اقدام</span></th></tr>
             </thead>
             <tbody>
               {rows.map((o) => (

@@ -865,6 +865,20 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 .pill.paid { background: color-mix(in srgb, var(--ok) 16%, var(--paper)); color: var(--ok); }
 .pill.sent { background: var(--sand); color: var(--wine); }
 .pill.wait { background: color-mix(in srgb, var(--warn) 18%, var(--paper)); color: var(--warn); }
+/* ── Revenue chart (hand-drawn; see admin/RevenueChart.jsx) ── */
+.chart-read { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-block-end: var(--s2); }
+.chart-read b { font-family: var(--font-display); font-size: 1.35rem; }
+.chart-read small { font-size: var(--t-xs); color: var(--ink-45); }
+.chart svg { width: 100%; height: auto; overflow: visible; }
+.chart-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 6; }
+.chart-line { fill: none; stroke: var(--wine); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
+.chart-dot { fill: var(--wine); transition: r 0.15s var(--ease); }
+.chart-tick { fill: var(--ink-45); font-size: 9px; font-family: var(--font-body); }
+.chart rect[role='button'] { cursor: pointer; }
+.chart rect[role='button']:focus-visible { outline: 2px solid var(--wine); outline-offset: -2px; }
+
+.panel-empty { color: var(--ink-45); font-size: var(--t-sm); padding-block: var(--s3); }
+
 .bar-row { display: grid; gap: 6px; margin-block-end: var(--s3); }
 .bar-track { height: 8px; background: var(--blush); border-radius: var(--r-full); overflow: hidden; }
 .bar-fill { height: 100%; background: var(--wine); border-radius: var(--r-full); transition: width 0.6s var(--ease); }

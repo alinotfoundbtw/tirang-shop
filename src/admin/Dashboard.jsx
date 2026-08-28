@@ -1,13 +1,13 @@
 import { Link } from 'react-router-dom';
-import {
-  ResponsiveContainer, AreaChart, Area, XAxis, YAxis, Tooltip, CartesianGrid,
-} from 'recharts';
 import { products, categories, revenueSeries, orders, botGaps, sizeCurve } from '../data/products';
+import RevenueChart from './RevenueChart';
 import { toman, short, fa, percent } from '../lib/format';
 
 const last = revenueSeries.at(-1);
-const prev = revenueSeries.at(-2);
-const growth = ((last.revenue - prev.revenue) / prev.revenue) * 100;
+const prev = revenueSeries.at(-2) ?? last;
+// A single week of history is not a trend; say nothing rather than divide by it.
+const growth = prev === last ? null : ((last.revenue - prev.revenue) / prev.revenue) * 100;
+const orderGrowth = prev === last ? null : ((last.orders - prev.orders) / prev.orders) * 100;
 const weekRevenue = last.revenue;
 const weekOrders = last.orders;
 const aov = Math.round(weekRevenue / weekOrders);
@@ -16,7 +16,7 @@ const Kpi = ({ label, value, delta, note }) => (
   <div className="kpi">
     <small>{label}</small>
     <b>{value}</b>
-    {delta !== undefined ? (
+    {delta !== undefined && delta !== null ? (
       <span className={`delta ${delta >= 0 ? 'up' : 'down'}`}>
         {delta >= 0 ? '▲' : '▼'} {percent(delta)} از هفتهٔ قبل
       </span>
@@ -53,47 +53,14 @@ export default function Dashboard() {
 
       <div className="kpis">
         <Kpi label="فروش هفته" value={toman(weekRevenue, { unit: false })} delta={growth} />
-        <Kpi label="سفارش‌ها" value={fa(weekOrders)} delta={((weekOrders - prev.orders) / prev.orders) * 100} />
+        <Kpi label="سفارش‌ها" value={fa(weekOrders)} delta={orderGrowth} />
         <Kpi label="میانگین سبد" value={short(aov)} note="تومان به ازای هر سفارش" />
         <Kpi label="نیازمند اقدام" value={fa(low.length + orders.filter((o) => o.status === 'wait').length)} note="کالای رو به اتمام و سفارش معطل" />
       </div>
 
       <div className="panel">
         <h3>روند فروش هفت هفتهٔ اخیر</h3>
-        <div style={{ width: '100%', height: 240, direction: 'ltr' }}>
-          <ResponsiveContainer>
-            <AreaChart data={revenueSeries} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-              <defs>
-                <linearGradient id="rev" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor="var(--wine)" stopOpacity={0.35} />
-                  <stop offset="100%" stopColor="var(--wine)" stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 6" stroke="var(--line)" vertical={false} />
-              <XAxis dataKey="day" tick={{ fontSize: 11, fill: 'var(--ink-45)' }} axisLine={false} tickLine={false} reversed />
-              <YAxis
-                tickFormatter={(v) => short(v)}
-                tick={{ fontSize: 11, fill: 'var(--ink-45)' }}
-                axisLine={false}
-                tickLine={false}
-                orientation="right"
-                width={54}
-              />
-              <Tooltip
-                formatter={(v) => [toman(v), 'فروش']}
-                labelStyle={{ fontFamily: 'var(--font-body)' }}
-                contentStyle={{
-                  fontFamily: 'var(--font-body)',
-                  fontSize: 12,
-                  borderRadius: 10,
-                  border: '1px solid var(--line)',
-                  direction: 'rtl',
-                }}
-              />
-              <Area type="monotone" dataKey="revenue" stroke="var(--wine)" strokeWidth={2.5} fill="url(#rev)" />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
+        <RevenueChart series={revenueSeries} />
       </div>
 
       <div style={{ display: 'grid', gap: 'var(--s4)', gridTemplateColumns: '1fr' }}>
@@ -158,6 +125,10 @@ export default function Dashboard() {
 
         <div className="panel">
           <h3>رو به اتمام — قبل از خالی‌شدن سفارش بدهید</h3>
+          {low.length === 0 && (
+            <p className="panel-empty">هیچ کالایی رو به اتمام نیست. موجودی همهٔ سایزها سالم است.</p>
+          )}
+          {low.length > 0 && (
           <div className="table-scroll">
             <table>
               <thead>
@@ -184,6 +155,7 @@ export default function Dashboard() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
 
         <div className="panel">
@@ -191,10 +163,12 @@ export default function Dashboard() {
           <p className="muted" style={{ fontSize: 'var(--t-xs)', marginBlockEnd: 'var(--s3)' }}>
             از پرسش‌های مشاور خرید درمی‌آید. هر خط یعنی تقاضایی که همین حالا در فروشگاه جوابی ندارد.
           </p>
+          {botGaps.length === 0 && <p className="panel-empty">پرسشی بی‌جواب نمانده است.</p>}
+          {botGaps.length > 0 && (
           <div className="table-scroll">
             <table>
               <thead>
-                <tr><th>پرسش</th><th>دفعات</th><th></th></tr>
+                <tr><th>پرسش</th><th>دفعات</th><th><span className="sr">اقدام</span></th></tr>
               </thead>
               <tbody>
                 {botGaps.map((g) => (
@@ -207,6 +181,7 @@ export default function Dashboard() {
               </tbody>
             </table>
           </div>
+          )}
         </div>
       </div>
     </>

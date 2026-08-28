@@ -18,7 +18,7 @@ const PRESETS = {
   'گل و گیاه': ['#14201a', '#f7faf6', '#e6efe6', '#2f5d3f', '#79a04c', '#dfe8cd'],
   'کافه و قهوه': ['#20160f', '#faf5ef', '#efe3d6', '#5b3a21', '#b5762c', '#e8d2ae'],
   'آرایشی و بهداشتی': ['#1d1620', '#fbf7fb', '#f0e6f2', '#5b2b63', '#b3499a', '#ecd9e8'],
-}; 
+};
 
 const FONTS = {
   'مربا + استعداد': ["'Morabba', 'Vazirmatn', sans-serif", "'Estedad', 'Vazirmatn', sans-serif"],
@@ -28,9 +28,11 @@ const FONTS = {
 
 export default function Brand() {
   const { toast } = useShop();
-  const [colors, setColors] = useState(PRESETS['تیرنگ — تیشرت']);
+  const DEFAULTS = PRESETS['تیرنگ — تیشرت'];
+  const [colors, setColors] = useState(DEFAULTS);
   const [font, setFont] = useState('مربا + استعداد');
   const [dark, setDark] = useState(false);
+  const touched = colors.join() !== DEFAULTS.join() || font !== 'مربا + استعداد' || dark;
 
   useEffect(() => {
     const root = document.documentElement;
@@ -53,7 +55,20 @@ export default function Brand() {
       </p>
 
       <div className="panel">
-        <h3>قالب آماده</h3>
+        <div className="row between" style={{ marginBlockEnd: 'var(--s4)' }}>
+          <h3 style={{ margin: 0 }}>قالب آماده</h3>
+          {/* These changes are global and immediate. Without this the only way
+              back to the shop's own colours was reloading the page. */}
+          {touched && (
+            <button
+              className="btn-quiet"
+              style={{ fontSize: 'var(--t-xs)' }}
+              onClick={() => { setColors(DEFAULTS); setFont('مربا + استعداد'); setDark(false); toast('به قالب اصلی برگشت'); }}
+            >
+              بازگشت به قالب اصلی
+            </button>
+          )}
+        </div>
         <div className="suggestions">
           {Object.entries(PRESETS).map(([name, v]) => (
             <button
