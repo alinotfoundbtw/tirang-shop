@@ -15,6 +15,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
+      # The repo already holds the photos and the script skips what exists,
+      # so a re-run has to start from an empty directory to pick up changes
+      # in how they are requested.
+      - run: rm -rf public/photos
       - run: node scripts/fetch-photos.mjs
       - uses: actions/upload-artifact@v4
         with:

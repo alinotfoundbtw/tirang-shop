@@ -17,8 +17,12 @@ const OUT = new URL('../public/photos/', import.meta.url);
 // Matches the px() helper in the catalog: px(123) or px(123, 'png').
 const CALL = /px\((\d+)(?:\s*,\s*'([a-z]+)')?\)/g;
 
+/* fm=jpg matters: auto=compress leaves a PNG source as PNG, and the two PNGs
+   in this catalog came back at 2.5 MB each — five of the eight megabytes for
+   two photos. Asking for JPEG puts them in line with the rest at ~50 KB, and
+   makes every file on disk a .jpg so the path rule has no exceptions. */
 const remote = (id, ext) =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.${ext}?auto=compress&cs=tinysrgb&w=900`;
+  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.${ext}?auto=compress&cs=tinysrgb&w=900&fm=jpg`;
 
 /** Trust the bytes, not the requested extension — auto=compress re-encodes. */
 function sniff(buf) {
@@ -65,6 +69,10 @@ const kinds = present.reduce((acc, f) => {
   return acc;
 }, {});
 console.log('extensions:', JSON.stringify(kinds));
+
+const odd = present.filter((f) => !f.endsWith('.jpg'));
+if (odd.length) console.warn(`
+not JPEG (px() assumes .jpg for all): ${odd.join(', ')}`);
 
 if (failed.length) {
   console.error(`\n${failed.length} failed:`);
