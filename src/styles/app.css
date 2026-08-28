@@ -1462,6 +1462,138 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
   .footer-brand { grid-column: auto; }
 }
 
+/* ── Checkout ──────────────────────────────────────────── */
+.checkout { padding-block: var(--s5) var(--s8); }
+.checkout h1 { font-size: var(--t-h1); margin-block-end: var(--s4); }
+.checkout-note {
+  margin-block-start: var(--s4); padding: var(--s3);
+  border-radius: var(--r-sm); background: var(--blush);
+  font-size: var(--t-xs); color: var(--ink-70); line-height: 1.85;
+}
+
+.pick-list { list-style: none; padding: 0; display: grid; gap: var(--s2); }
+.pick-list label {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s3);
+  align-items: start; padding: var(--s3);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  cursor: pointer; transition: border-color 0.18s var(--ease);
+}
+.pick-list label.on { border-color: var(--wine); background: var(--wine-soft); }
+.pick-list input { accent-color: var(--wine); margin-block-start: 3px; }
+.pick-list b { display: block; font-size: var(--t-sm); }
+.pick-list small { display: block; font-size: var(--t-xs); color: var(--ink-45); }
+
+.check-lines { list-style: none; padding: 0; display: grid; gap: var(--s2); }
+.check-lines li {
+  display: flex; align-items: baseline; justify-content: space-between;
+  gap: var(--s3); font-size: var(--t-sm);
+  padding-block: var(--s2); border-block-end: 1px dashed var(--line);
+}
+.check-lines li:last-child { border-block-end: 0; }
+.check-lines li > span { min-width: 0; }
+
+/* ── The shopper's order pages ─────────────────────────── */
+.orders { padding-block: var(--s5) var(--s8); }
+.orders h1 { font-size: var(--t-h1); margin-block: var(--s2) var(--s4); }
+
+.order-list { list-style: none; padding: 0; display: grid; gap: var(--s3); }
+.order-list > li > a {
+  display: block; padding: var(--s4);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface);
+  transition: border-color 0.18s var(--ease);
+}
+.order-list > li > a:hover { border-color: var(--wine); }
+.order-row { display: flex; align-items: center; gap: var(--s3); flex-wrap: wrap; }
+.order-row > span:first-child { flex: 1; min-width: 0; }
+.order-row b { display: block; font-size: var(--t-sm); }
+.order-row small { display: block; font-size: var(--t-xs); color: var(--ink-45); }
+.order-total { flex: none; font-size: var(--t-sm); }
+.order-thumbs { display: flex; gap: 6px; margin-block-start: var(--s3); }
+.order-thumbs img {
+  width: 38px; height: 48px; object-fit: cover;
+  border-radius: 6px; background: var(--blush);
+}
+
+/* The pipeline, as a line you can see your parcel moving along. */
+.track { list-style: none; padding: 0; margin-block: var(--s4); display: grid; gap: 0; }
+.track li {
+  position: relative;
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s3);
+  padding-inline-start: 4px; padding-block-end: var(--s5);
+}
+.track li:last-child { padding-block-end: 0; }
+/* The rail is drawn by each step except the last, so it never overshoots. */
+.track li:not(:last-child)::before {
+  content: ''; position: absolute;
+  inset-block: 18px 0; inset-inline-start: 9px;
+  border-inline-start: 2px solid var(--line);
+}
+.track li.done:not(:last-child)::before { border-color: var(--wine); }
+.track-dot {
+  width: 20px; height: 20px; border-radius: var(--r-full);
+  border: 2px solid var(--line-strong); background: var(--paper);
+  z-index: 1;
+}
+.track li.done .track-dot { background: var(--wine); border-color: var(--wine); }
+.track li.now .track-dot {
+  border-color: var(--wine);
+  box-shadow: 0 0 0 4px var(--wine-soft);
+}
+.track b { display: block; font-size: var(--t-sm); }
+.track li:not(.done):not(.now) b { color: var(--ink-45); }
+.track small { font-size: var(--t-xs); color: var(--ink-45); }
+.track p { font-size: var(--t-xs); color: var(--ink-70); margin-block-start: 2px; }
+.track.compact li { padding-block-end: var(--s4); }
+.track.compact p { display: none; }
+
+.copy-code {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 3px 8px; border-radius: var(--r-sm);
+  background: var(--blush); color: var(--ink);
+  font-size: var(--t-sm);
+}
+.copy-code:hover { color: var(--wine); }
+
+/* ── Orders, in the panel ──────────────────────────────── */
+.order-cards { display: grid; gap: var(--s3); margin-block-start: var(--s4); }
+.order-card {
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface); overflow: hidden;
+}
+.order-card.open { border-color: var(--line-strong); }
+.order-head {
+  width: 100%; display: flex; align-items: center; gap: var(--s3);
+  padding: var(--s3) var(--s4); text-align: start; flex-wrap: wrap;
+}
+.order-head:hover { background: var(--blush); }
+.order-id { font-size: var(--t-xs); color: var(--ink-45); flex: none; }
+.order-who { flex: 1; min-width: 0; }
+.order-who b { display: block; font-size: var(--t-sm); }
+.order-who small { display: block; font-size: var(--t-xs); color: var(--ink-45); }
+.order-card.open .order-head svg { transform: rotate(90deg); }
+.order-head svg { transition: transform 0.2s var(--ease); color: var(--ink-45); flex: none; }
+
+.order-body { padding: 0 var(--s4) var(--s4); border-block-start: 1px solid var(--line); }
+.order-body h4 {
+  font-size: var(--t-xs); color: var(--ink-45); letter-spacing: 0.06em;
+  margin-block: var(--s4) var(--s2);
+}
+.order-grid { display: grid; gap: var(--s4); }
+.order-grid p { font-size: var(--t-sm); }
+
+.advance {
+  display: grid; gap: var(--s3);
+  padding: var(--s4); margin-block-start: var(--s4);
+  border-radius: var(--r-md); background: var(--blush);
+}
+.advance h4 { margin-block-start: 0; color: var(--ink); font-size: var(--t-sm); }
+.advance .btn { display: inline-flex; gap: 6px; }
+
+@media (min-width: 700px) {
+  .order-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
 /* ── Admin ─────────────────────────────────────────────── */
 .admin { min-height: 100dvh; display: grid; grid-template-columns: 1fr; background: var(--paper); }
 .admin-side {
@@ -1504,17 +1636,21 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 .pill.paid { background: color-mix(in srgb, var(--ok) 16%, var(--paper)); color: var(--ok); }
 .pill.sent { background: var(--sand); color: var(--wine); }
 .pill.wait { background: color-mix(in srgb, var(--warn) 18%, var(--paper)); color: var(--warn); }
-/* ── Revenue chart (hand-drawn; see admin/RevenueChart.jsx) ── */
-.chart-read { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-block-end: var(--s2); }
-.chart-read b { font-family: var(--font-display); font-size: 1.35rem; }
+/* ── Revenue chart (see admin/RevenueChart.jsx) ──
+   The SVG is drawn at the measured pixel width, so nothing here scales it. */
+.chart { width: 100%; }
+.chart-read { display: flex; align-items: baseline; gap: var(--s3); flex-wrap: wrap; margin-block-end: var(--s3); }
+.chart-read b { font-family: var(--font-display); font-size: 1.3rem; }
 .chart-read small { font-size: var(--t-xs); color: var(--ink-45); }
-.chart svg { width: 100%; height: auto; overflow: visible; }
-.chart-grid { stroke: var(--line); stroke-width: 1; stroke-dasharray: 3 6; }
-.chart-line { fill: none; stroke: var(--wine); stroke-width: 2.5; stroke-linejoin: round; stroke-linecap: round; }
-.chart-dot { fill: var(--wine); transition: r 0.15s var(--ease); }
-.chart-tick { fill: var(--ink-45); font-size: 9px; font-family: var(--font-body); }
-.chart rect[role='button'] { cursor: pointer; }
-.chart rect[role='button']:focus-visible { outline: 2px solid var(--wine); outline-offset: -2px; }
+.chart-read .delta { margin-inline-start: 4px; }
+.chart svg { display: block; }
+.chart-grid { stroke: var(--line); stroke-width: 1; }
+.chart-tick { fill: var(--ink-45); font-size: 10px; font-family: var(--font-body); }
+.chart-bar rect + rect { fill: color-mix(in srgb, var(--wine) 34%, transparent); transition: fill 0.18s var(--ease); }
+.chart-bar.on rect + rect { fill: var(--wine); }
+.chart-bar { cursor: pointer; }
+.chart-bar:focus { outline: none; }
+.chart-bar:focus-visible rect + rect { fill: var(--wine); stroke: var(--ink); stroke-width: 1.5; }
 
 .panel-empty { color: var(--ink-45); font-size: var(--t-sm); padding-block: var(--s3); }
 

@@ -90,6 +90,14 @@ function AccountTab({ acc }) {
       </div>
 
       <div className="panel">
+        <h3>خریدهای من</h3>
+        <p className="muted" style={{ fontSize: 'var(--t-sm)', marginBlockEnd: 'var(--s3)' }}>
+          وضعیت هر سفارش، کد پیگیری پرداخت و کد رهگیری مرسوله.
+        </p>
+        <Link to="/orders" className="btn btn-ghost">دیدن خریدهای اخیر</Link>
+      </div>
+
+      <div className="panel">
         <h3>نظرهای من</h3>
         {mine.length === 0 ? (
           <p className="panel-empty">هنوز نظری ننوشته‌ای. از صفحهٔ هر تیشرت می‌توانی بنویسی.</p>

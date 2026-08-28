@@ -76,13 +76,13 @@ export default function Cart() {
         <div className="row between sum"><span>قابل پرداخت</span><b className="num">{toman(subtotal + shipping)}</b></div>
       </div>
 
-      <button
+      <Link
+        to="/checkout"
         className="btn btn-primary btn-block"
         style={{ marginBlockStart: 'var(--s4)' }}
-        onClick={() => toast('اینجا به درگاه پرداخت وصل می‌شود', 'warn')}
       >
         ادامهٔ خرید و پرداخت
-      </button>
+      </Link>
       <p className="muted" style={{ fontSize: 'var(--t-xs)', textAlign: 'center', marginBlockStart: 'var(--s3)' }}>
         پرداخت امن با کارت‌های شتاب · تعویض سایز رایگان تا ۷ روز
       </p>

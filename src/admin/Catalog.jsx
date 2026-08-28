@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { products as seed, categories, orders as seedOrders } from '../data/products';
+import { products as seed, categories } from '../data/products';
 import { toman, fa } from '../lib/format';
 import { normalize } from '../lib/rag';
 import { useShop } from '../lib/store';
@@ -155,60 +155,6 @@ export function Catalog() {
             </table>
           </div>
         )}
-      </div>
-    </>
-  );
-}
-
-const STATUS = { paid: ['پرداخت شده', 'paid'], sent: ['ارسال شده', 'sent'], wait: ['در انتظار پرداخت', 'wait'] };
-
-export function Orders() {
-  const [rows, setRows] = useState(seedOrders);
-  const { toast } = useShop();
-  const advance = (id) => {
-    const order = rows.find((o) => o.id === id);
-    if (!order || order.status === 'sent') return;
-    const next = order.status === 'wait' ? 'paid' : 'sent';
-    // Outside the updater on purpose: an updater has to be pure, and React 18
-    // runs it twice in development — which fired this toast twice per click.
-    setRows((r) => r.map((o) => (o.id === id ? { ...o, status: next } : o)));
-    toast(`سفارش ${id} → ${STATUS[next][0]}`);
-  };
-
-  const revenue = rows.filter((o) => o.status !== 'wait').reduce((s, o) => s + o.total, 0);
-
-  return (
-    <>
-      <h1 style={{ fontSize: 'var(--t-h1)' }}>سفارش‌ها</h1>
-      <p className="muted" style={{ fontSize: 'var(--t-sm)' }}>
-        {fa(rows.length)} سفارش · {toman(revenue)} تأییدشده
-      </p>
-      <div className="panel">
-        <div className="table-scroll">
-          <table>
-            <thead>
-              <tr><th>شماره</th><th>مشتری</th><th>شهر</th><th>مبلغ</th><th>وضعیت</th><th><span className="sr">اقدام</span></th></tr>
-            </thead>
-            <tbody>
-              {rows.map((o) => (
-                <tr key={o.id}>
-                  <td className="num">{o.id}</td>
-                  <td>{o.customer}</td>
-                  <td className="muted">{o.city}</td>
-                  <td className="num">{toman(o.total, { unit: false })}</td>
-                  <td><span className={`pill ${o.status}`}>{STATUS[o.status][0]}</span></td>
-                  <td>
-                    {o.status !== 'sent' && (
-                      <button className="btn-quiet" style={{ fontSize: 'var(--t-xs)' }} onClick={() => advance(o.id)}>
-                        {o.status === 'wait' ? 'ثبت پرداخت' : 'ثبت ارسال'}
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
       </div>
     </>
   );

@@ -6,7 +6,6 @@ const links = [
   { to: `/${ADMIN_PATH}`, label: 'خلاصهٔ فروش', end: true },
   { to: `/${ADMIN_PATH}/catalog`, label: 'محصولات' },
   { to: `/${ADMIN_PATH}/orders`, label: 'سفارش‌ها' },
-  { to: `/${ADMIN_PATH}/brand`, label: 'ظاهر فروشگاه' },
 ];
 
 export default function Admin() {

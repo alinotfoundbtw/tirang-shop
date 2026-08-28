@@ -8,6 +8,8 @@ import Cart from './pages/Cart';
 import Ask from './pages/Ask';
 import Auth from './pages/Auth';
 import Profile from './pages/Profile';
+import Checkout from './pages/Checkout';
+import { Orders, OrderDetail } from './pages/Orders';
 import { Faq, Wishlist, NotFound } from './pages/Static';
 import { ADMIN_PATH } from './lib/routes';
 import { Loader, ErrorState } from './components/States';
@@ -15,9 +17,8 @@ import { Loader, ErrorState } from './components/States';
 // The panel is only for the owner — visitors shouldn't download it.
 const Admin = lazy(() => import('./admin/Admin'));
 const Dashboard = lazy(() => import('./admin/Dashboard'));
-const Brand = lazy(() => import('./admin/Brand'));
 const Catalog = lazy(() => import('./admin/Catalog').then((m) => ({ default: m.Catalog })));
-const Orders = lazy(() => import('./admin/Catalog').then((m) => ({ default: m.Orders })));
+const AdminOrders = lazy(() => import('./admin/Orders'));
 
 class Boundary extends Component {
   state = { error: null };
@@ -53,13 +54,15 @@ export default function App() {
             <Route path="wishlist" element={<Wishlist />} />
             <Route path="enter" element={<Auth />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="checkout" element={<Checkout />} />
+            <Route path="orders" element={<Orders />} />
+            <Route path="orders/:id" element={<OrderDetail />} />
             <Route path="*" element={<NotFound />} />
           </Route>
           <Route path={ADMIN_PATH} element={<Admin />}>
             <Route index element={<Dashboard />} />
             <Route path="catalog" element={<Catalog />} />
-            <Route path="orders" element={<Orders />} />
-            <Route path="brand" element={<Brand />} />
+            <Route path="orders" element={<AdminOrders />} />
           </Route>
         </Routes>
       </Suspense>
