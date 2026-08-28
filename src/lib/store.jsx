@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useReducer,
 import { products } from '../data/products';
 
 const CART = 'tirang.cart.v1';
+const THEME = 'tirang.theme.v1';
 const WISH = 'tirang.wish.v1';
 const SEEN = 'tirang.seen.v1';
 const ShopCtx = createContext(null);
@@ -45,10 +46,51 @@ export function ShopProvider({ children }) {
   const [wish, setWish] = useState(() => read(WISH, []));
   const [seen, setSeen] = useState(() => read(SEEN, []));
   const [toasts, setToasts] = useState([]);
+  /* null means "follow the system". Only a deliberate tap writes 'light' or
+     'dark', which is the difference between respecting a phone's setting and
+     overriding it on first visit. */
+  const [theme, setTheme] = useState(() => read(THEME, null));
 
   useEffect(() => write(CART, lines), [lines]);
   useEffect(() => write(WISH, wish), [wish]);
   useEffect(() => write(SEEN, seen), [seen]);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    if (theme) root.setAttribute('data-theme', theme);
+    else root.removeAttribute('data-theme');
+    write(THEME, theme);
+
+    /* The browser chrome reads a meta tag, not our CSS. index.html ships one
+       per colour scheme, which is right until someone picks the scheme their
+       OS did not — then the status bar is the only thing still light. */
+    const dark = theme === 'dark' || (!theme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document
+      .querySelectorAll('meta[name="theme-color"]')
+      .forEach((m) => m.setAttribute('content', dark ? '#101116' : '#F8F7F4'));
+  }, [theme]);
+
+  // Following the system means following it as it changes, not just at load.
+  useEffect(() => {
+    if (theme) return undefined;
+    const mq = window.matchMedia('(prefers-color-scheme: dark)');
+    const sync = () =>
+      document
+        .querySelectorAll('meta[name="theme-color"]')
+        .forEach((m) => m.setAttribute('content', mq.matches ? '#101116' : '#F8F7F4'));
+    mq.addEventListener('change', sync);
+    return () => mq.removeEventListener('change', sync);
+  }, [theme]);
+
+  const isDark = theme
+    ? theme === 'dark'
+    : typeof window !== 'undefined' && window.matchMedia('(prefers-color-scheme: dark)').matches;
+  const toggleTheme = useCallback(() => {
+    setTheme((t) => {
+      const now = t ?? (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      return now === 'dark' ? 'light' : 'dark';
+    });
+  }, []);
 
   const toast = useCallback((text) => {
     const id = Math.random().toString(36).slice(2);
@@ -82,6 +124,7 @@ export function ShopProvider({ children }) {
     lines: detailed, dispatch, count, subtotal, shipping,
     wish, toggleWish, seen, markSeen,
     toast, toasts,
+    theme, setTheme, isDark, toggleTheme,
   };
   return <ShopCtx.Provider value={value}>{children}</ShopCtx.Provider>;
 }

@@ -27,11 +27,14 @@ const FONTS = {
 };
 
 export default function Brand() {
-  const { toast } = useShop();
+  const { toast, isDark, setTheme } = useShop();
   const DEFAULTS = PRESETS['تیرنگ — تیشرت'];
   const [colors, setColors] = useState(DEFAULTS);
   const [font, setFont] = useState('مربا + استعداد');
-  const [dark, setDark] = useState(false);
+  // The header toggle owns data-theme; this switch drives the same state
+  // rather than writing the attribute behind its back.
+  const dark = isDark;
+  const setDark = (on) => setTheme(on ? 'dark' : 'light');
   const touched = colors.join() !== DEFAULTS.join() || font !== 'مربا + استعداد' || dark;
 
   useEffect(() => {
@@ -40,8 +43,7 @@ export default function Brand() {
     const [display, body] = FONTS[font];
     root.style.setProperty('--font-display', display);
     root.style.setProperty('--font-body', body);
-    dark ? root.setAttribute('data-theme', 'dark') : root.removeAttribute('data-theme');
-  }, [colors, font, dark]);
+  }, [colors, font]);
 
   const snippet = `:root {\n${VARS.map(([n], i) => `  --${n}: ${colors[i]};`).join('\n')}\n  --font-display: ${FONTS[font][0]};\n  --font-body: ${FONTS[font][1]};\n}`;
 
@@ -63,7 +65,7 @@ export default function Brand() {
             <button
               className="btn-quiet"
               style={{ fontSize: 'var(--t-xs)' }}
-              onClick={() => { setColors(DEFAULTS); setFont('مربا + استعداد'); setDark(false); toast('به قالب اصلی برگشت'); }}
+              onClick={() => { setColors(DEFAULTS); setFont('مربا + استعداد'); setTheme('light'); toast('به قالب اصلی برگشت'); }}
             >
               بازگشت به قالب اصلی
             </button>

@@ -81,6 +81,16 @@
   :root { --gutter: var(--s5); --bottom-safe: 0px; }
 }
 
+/* ── Dark ──────────────────────────────────────────────────
+   Two selectors, one palette. `[data-theme]` is written by the header
+   toggle and wins outright; the media query covers everyone who never
+   touched it. The `:not([data-theme='light'])` guard is what lets a
+   shopper on a dark phone choose light and have it stick.
+
+   The eight declarations are repeated rather than aliased through a
+   second set of variables — an indirection that reads worse than the
+   duplication it removes. Keep the two blocks in step.
+   ───────────────────────────────────────────────────────── */
 [data-theme='dark'] {
   --ink: #f2f2f0;
   --paper: #101116;
@@ -90,4 +100,17 @@
   --sand: #2a2e3f;
   --surface: #181a21;
   --line: color-mix(in srgb, var(--ink) 14%, var(--paper));
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme='light']) {
+    --ink: #f2f2f0;
+    --paper: #101116;
+    --blush: #1b1d24;
+    --wine: #7d90ff;
+    --cherry: #ff7f4d;
+    --sand: #2a2e3f;
+    --surface: #181a21;
+    --line: color-mix(in srgb, var(--ink) 14%, var(--paper));
+  }
 }

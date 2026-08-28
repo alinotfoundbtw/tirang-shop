@@ -2,6 +2,7 @@ import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useShop } from '../lib/store';
 import Footer from './Footer';
+import QuickSearch from './QuickSearch';
 import { fa } from '../lib/format';
 
 const Icon = ({ d, size = 22 }) => (
@@ -17,6 +18,8 @@ const icons = {
   bag: <><path d="M6 8h12l1 12H5z" /><path d="M9 8V6a3 3 0 0 1 6 0v2" /></>,
   heart: <path d="M12 20s-7-4.6-7-9.4A4.1 4.1 0 0 1 12 8a4.1 4.1 0 0 1 7 2.6C19 15.4 12 20 12 20Z" />,
   search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
+  sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19" /></>,
+  moon: <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.5 8.5 0 1 0 10.2 10.2Z" />,
 };
 
 const notes = [
@@ -34,7 +37,7 @@ const tabs = [
 ];
 
 export default function Layout() {
-  const { count, toasts, wish } = useShop();
+  const { count, toasts, wish, isDark, toggleTheme } = useShop();
   const { pathname } = useLocation();
 
   /* Layout effect, so the reset lands inside the same synchronous flush as the
@@ -82,9 +85,15 @@ export default function Layout() {
           </nav>
 
           <div className="header-actions">
-            <Link to="/products" className="icon-btn" aria-label="جست‌وجو">
-              <Icon d={icons.search} />
-            </Link>
+            <QuickSearch />
+            <button
+              className="icon-btn"
+              onClick={toggleTheme}
+              aria-label={isDark ? 'روشن کردن ظاهر' : 'تاریک کردن ظاهر'}
+              aria-pressed={isDark}
+            >
+              <Icon d={isDark ? icons.sun : icons.moon} size={20} />
+            </button>
             <Link to="/wishlist" className="icon-btn" aria-label={`علاقه‌مندی‌ها، ${wish.length} کالا`}>
               <Icon d={icons.heart} />
               {wish.length > 0 && <span className="cart-count num">{fa(wish.length)}</span>}
