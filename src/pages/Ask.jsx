@@ -2,6 +2,7 @@ import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { products } from '../data/products';
 import { helpTopics } from '../data/help';
+import Orb from '../components/Orb';
 import { search } from '../lib/rag';
 import { sizeFromHeight } from '../lib/sizing';
 import { useSeo } from '../lib/seo';
@@ -177,6 +178,16 @@ export default function Ask() {
 
       {/* ── Pick a track ── */}
       {!track && (
+        <div className="console-stage">
+          <Orb size={200} />
+          <p className="console-say">
+            بگو دنبال چه هستی — چند سؤال کوتاه می‌پرسم و از بین چیزهایی که واقعاً موجود است انتخاب
+            می‌کنم. یا اگر جایی از سایت گیر کرده‌ای، همان را بپرس.
+          </p>
+        </div>
+      )}
+
+      {!track && (
         <div className="tracks">
           <button className="track" onClick={() => setTrack('find')}>
             <span className="track-art"><Icon d={art.spark} size={26} /></span>
@@ -196,6 +207,7 @@ export default function Ask() {
       {/* ── Guided find ── */}
       {track === 'find' && (
         <div className="quiz">
+          <Orb size={92} busy={!done} />
           <ol className="quiz-rail" aria-label="مراحل">
             {STEPS.map((s, i) => (
               <li key={s.key} className={i < step ? 'done' : i === step ? 'now' : ''}>

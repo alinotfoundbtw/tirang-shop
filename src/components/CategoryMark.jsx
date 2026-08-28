@@ -1,75 +1,88 @@
 /**
- * A drawn mark per category, keyed by slug.
+ * Category icons, from Tabler Icons 3.46.0 — MIT licensed.
+ * https://github.com/tabler/tabler-icons
  *
- * Every one of these is the same tee silhouette with one thing changed — the
- * shoulder line, the neck, the print, the count — so the set reads as one
- * family rather than six clip-art icons. They inherit `currentColor`, so a
- * re-skin carries them along with everything else.
+ * Vendored rather than installed: six icons do not justify a dependency, and
+ * this keeps them on our own origin, which matters for a shop served to a
+ * network that blocks half the CDNs.
+ *
+ * They come from one family — 24×24 grid, 2px stroke, round caps — which is
+ * the point. Six icons drawn by hand look like six icons; six from one set
+ * look like a set. Paths are copied verbatim; if you swap one, take it from
+ * the same family or the row stops matching.
  */
 
-const shell = 'M31 6 L14 14 L6 30 L18 36 L18 66 L68 66 L68 36 L80 30 L72 14 L55 6 Q43 18 31 6 Z';
-
 const marks = {
-  // Dropped shoulder, wider body: the oversize cut.
+  // tabler: hanger-2 — a shirt hanging loose, for the oversize cut
   oversize: (
     <>
-      <path d="M29 6 L10 15 L2 32 L15 38 L15 66 L71 66 L71 38 L84 32 L76 15 L57 6 Q43 19 29 6 Z" />
-      <path d="M15 38 L15 46M71 38 L71 46" opacity="0.45" />
+      <path d="M12 9l-7.971 4.428a2 2 0 0 0 -1.029 1.749v.823a2 2 0 0 0 2 2h1" />
+      <path d="M18 18h1a2 2 0 0 0 2 -2v-.823a2 2 0 0 0 -1.029 -1.749l-7.971 -4.428c-1.457 -.81 -1.993 -2.333 -2 -4a2 2 0 1 1 4 0" />
+      <path d="M6 18a2 2 0 0 1 2 -2h8a2 2 0 0 1 2 2v1a2 2 0 0 1 -2 2h-8a2 2 0 0 1 -2 -2l0 -1" />
     </>
   ),
-  // The plain one. Nothing but the crew neck.
-  basic: (
-    <>
-      <path d={shell} />
-      <path d="M31 6 Q43 18 55 6" opacity="0.55" />
-    </>
-  ),
-  // A print block on the chest.
+  // tabler: shirt
+  basic: <path d="M15 4l6 2v5h-3v8a1 1 0 0 1 -1 1h-10a1 1 0 0 1 -1 -1v-8h-3v-5l6 -2a3 3 0 0 0 6 0" />,
+  // tabler: palette — the printed ones
   graphic: (
     <>
-      <path d={shell} />
-      <rect x="32" y="30" width="22" height="20" rx="2.5" opacity="0.9" />
-      <path d="M36 44 L41 38 L45 43 L49 35" opacity="0.7" />
+      <path d="M12 21a9 9 0 0 1 0 -18c4.97 0 9 3.582 9 8c0 1.06 -.474 2.078 -1.318 2.828c-.844 .75 -1.989 1.172 -3.182 1.172h-2.5a2 2 0 0 0 -1 3.75a1.3 1.3 0 0 1 -1 2.25" />
+      <path d="M7.5 10.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+      <path d="M11.5 7.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
+      <path d="M15.5 10.5a1 1 0 1 0 2 0a1 1 0 1 0 -2 0" />
     </>
   ),
-  // Narrower waist, scooped neck.
+  // tabler: woman
   women: (
     <>
-      <path d="M32 6 L16 14 L9 29 L19 35 L21 66 L65 66 L67 35 L77 29 L70 14 L54 6 Q43 16 32 6 Z" />
-      <path d="M32 6 Q43 16 54 6" opacity="0.55" />
+      <path d="M10 16v5" />
+      <path d="M14 16v5" />
+      <path d="M8 16h8l-2 -7h-4l-2 7" />
+      <path d="M5 11c1.667 -1.333 3.333 -2 5 -2" />
+      <path d="M19 11c-1.667 -1.333 -3.333 -2 -5 -2" />
+      <path d="M10 4a2 2 0 1 0 4 0a2 2 0 1 0 -4 0" />
     </>
   ),
-  // Same shirt, smaller, with a little collar tab.
+  // tabler: mood-kid
   kids: (
     <>
-      <path d="M34 14 L21 20 L15 33 L25 38 L25 60 L61 60 L61 38 L71 33 L65 20 L52 14 Q43 23 34 14 Z" />
-      <circle cx="43" cy="27" r="3" opacity="0.7" />
+      <path d="M3 12a9 9 0 1 0 18 0a9 9 0 1 0 -18 0" />
+      <path d="M9 10l.01 0" />
+      <path d="M15 10l.01 0" />
+      <path d="M9.5 15a3.5 3.5 0 0 0 5 0" />
+      <path d="M12 3a2 2 0 0 0 0 4" />
     </>
   ),
-  // Two shirts, stacked — the pack.
+  // tabler: packages
   pack: (
     <>
-      <path d="M26 20 L14 26 L8 38 L17 42 L17 62 L53 62 L53 42 L62 38 L56 26 L44 20 Q35 28 26 20 Z" opacity="0.45" />
-      <path d="M42 10 L30 16 L24 28 L33 32 L33 52 L69 52 L69 32 L78 28 L72 16 L60 10 Q51 18 42 10 Z" />
+      <path d="M7 16.5l-5 -3l5 -3l5 3v5.5l-5 3l0 -5.5" />
+      <path d="M2 13.5v5.5l5 3" />
+      <path d="M7 16.545l5 -3.03" />
+      <path d="M17 16.5l-5 -3l5 -3l5 3v5.5l-5 3l0 -5.5" />
+      <path d="M12 19l5 3" />
+      <path d="M17 16.5l5 -3" />
+      <path d="M12 13.5v-5.5l-5 -3l5 -3l5 3v5.5" />
+      <path d="M7 5.03v5.455" />
+      <path d="M12 8l5 -3" />
     </>
   ),
 };
 
-export default function CategoryMark({ slug, size = 44 }) {
-  const mark = marks[slug] ?? marks.basic;
+export default function CategoryMark({ slug, size = 26 }) {
   return (
     <svg
       width={size}
-      height={size * 0.84}
-      viewBox="0 0 86 72"
+      height={size}
+      viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth="3"
-      strokeLinejoin="round"
+      strokeWidth="1.75"
       strokeLinecap="round"
+      strokeLinejoin="round"
       aria-hidden="true"
     >
-      {mark}
+      {marks[slug] ?? marks.basic}
     </svg>
   );
 }

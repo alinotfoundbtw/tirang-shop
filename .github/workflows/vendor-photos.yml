@@ -23,8 +23,12 @@ jobs:
           node-version: 20
       # Scouting mode: find candidates and hand back previews only. Nothing
       # reaches the catalog until a human has looked at them.
+      # Needs a PEXELS_API_KEY repository secret; the public search pages
+      # return 403 to every datacenter IP, so there is no key-free route.
       - name: Scout
         if: inputs.scout != ''
+        env:
+          PEXELS_API_KEY: ${{ secrets.PEXELS_API_KEY }}
         run: node scripts/find-photos.mjs ${{ inputs.scout }}
       - uses: actions/upload-artifact@v4
         if: inputs.scout != ''

@@ -78,6 +78,7 @@ h1, h2, h3 { font-family: var(--font-display); font-weight: 700; line-height: 1.
 .section { padding-block: var(--s6); }
 .section-head { display: flex; align-items: baseline; justify-content: space-between; gap: var(--s4); margin-block-end: var(--s4); }
 .section-head h2 { font-size: var(--t-h2); }
+.section-note { font-size: var(--t-xs); color: var(--ink-45); margin-block-start: 2px; }
 .link-more {
   font-size: var(--t-sm); color: var(--wine);
   border-block-end: 1px solid currentColor; padding-block-end: 1px;
@@ -491,6 +492,27 @@ textarea.field { min-height: 96px; resize: vertical; }
 }
 .rail::-webkit-scrollbar { display: none; }
 .rail > * { scroll-snap-align: start; }
+/* Says how much is in the rail, since a scroll strip hides its own length. */
+.rail-hint { font-size: var(--t-xs); color: var(--ink-45); margin-block-start: var(--s2); }
+@media (hover: hover) { .rail-hint { display: none; } }
+
+/* ── Review strip on the home page ── */
+.voices { grid-auto-columns: 78%; align-items: stretch; }
+.voice {
+  display: flex; flex-direction: column; justify-content: space-between; gap: var(--s4);
+  padding: var(--s4); border-radius: var(--r-md);
+  border: 1px solid var(--line); background: var(--surface);
+}
+.voice p { font-size: var(--t-sm); line-height: 1.85; color: var(--ink-70); }
+.voice footer { display: flex; align-items: center; gap: var(--s2); }
+.voice-avatar {
+  width: 32px; height: 32px; border-radius: var(--r-full); flex: none;
+  display: grid; place-items: center;
+  background: var(--sand); color: var(--wine);
+  font-family: var(--font-display); font-weight: 700; font-size: 0.9rem;
+}
+.voice footer b { display: block; font-size: var(--t-sm); }
+.voice footer small { font-size: var(--t-xs); color: var(--ink-45); }
 
 .card { position: relative; display: flex; flex-direction: column; background: var(--surface); border-radius: var(--r-md); border: 1px solid var(--line); overflow: hidden; transition: transform 0.25s var(--ease), box-shadow 0.25s; }
 .card:hover { transform: translateY(-3px); box-shadow: var(--shadow-1); }
@@ -596,38 +618,32 @@ textarea.field { min-height: 96px; resize: vertical; }
 }
 
 /* ── Category tiles ────────────────────────────────────────
-   Each tile carries its own drawn cut (components/CategoryMark.jsx) — the
-   same shirt with one thing changed, so the six read as a set. The mark is
-   oversized and clipped at the corner: decoration that shows the product
-   rather than a generic icon sitting in a box.
+   The mark sits in its own chip at the top rather than as a watermark
+   behind the text: these are real icons on a 24px grid, and blowing one up
+   to four times its size shows every joint in it.
    ───────────────────────────────────────────────────────── */
 .cats { display: grid; grid-template-columns: repeat(2, 1fr); gap: var(--s3); }
 .cat {
-  position: relative; overflow: hidden; isolation: isolate;
+  position: relative; overflow: hidden;
   padding: var(--s4); border-radius: var(--r-md);
-  background: var(--blush); border: 1px solid transparent;
+  background: var(--surface); border: 1px solid var(--line);
   transition: border-color 0.22s var(--ease), background 0.22s var(--ease), transform 0.22s var(--ease);
   display: flex; flex-direction: column; gap: 2px;
-  min-height: 116px; justify-content: flex-end;
+  min-height: 128px;
 }
 .cat-mark {
-  position: absolute; z-index: -1;
-  inset-block-start: -6px; inset-inline-end: -10px;
-  color: var(--ink);
-  opacity: 0.14;
-  transform: rotate(-8deg) scale(1.7); transform-origin: top right;
-  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease);
-  pointer-events: none;
+  width: 42px; height: 42px; border-radius: var(--r-md);
+  display: grid; place-items: center;
+  background: var(--blush); color: var(--wine);
+  margin-block-end: auto;
+  transition: background 0.22s var(--ease), color 0.22s var(--ease), transform 0.25s var(--ease);
 }
 .cat:hover { border-color: var(--wine); background: var(--wine-soft); }
-.cat:hover .cat-mark { opacity: 0.3; color: var(--wine); transform: rotate(-4deg) scale(1.8); }
+.cat:hover .cat-mark { background: var(--wine); color: #fff; transform: translateY(-2px); }
 .cat:active { transform: scale(0.985); }
-.cat b { font-family: var(--font-display); font-size: 1.05rem; }
+.cat b { font-family: var(--font-display); font-size: 1.05rem; margin-block-start: var(--s3); }
 .cat-note { font-size: var(--t-xs); color: var(--ink-45); }
-.cat-count {
-  font-size: 10px; color: var(--wine); font-weight: 600;
-  margin-block-start: var(--s2);
-}
+.cat-count { font-size: 10px; color: var(--wine); font-weight: 600; margin-block-start: var(--s2); }
 
 /* ── Gallery: zoom lens + lightbox ─────────────────────── */
 .gallery { display: grid; gap: var(--s2); }
@@ -841,12 +857,139 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 .suggestions::-webkit-scrollbar { display: none; }
 .suggestions > * { flex: none; }
 
+/* ── The assistant orb ─────────────────────────────────────
+   Blurred blobs drifting behind a glass highlight. Only transform and
+   opacity animate, so this stays on the compositor; animating the blur or
+   the gradient stops would repaint every frame on a phone.
+   ───────────────────────────────────────────────────────── */
+.orb {
+  position: relative;
+  width: var(--orb); height: var(--orb);
+  margin-inline: auto;
+  display: grid; place-items: center;
+  flex: none;
+}
+
+.orb-ball {
+  position: relative;
+  width: 100%; height: 100%;
+  border-radius: 50%;
+  overflow: hidden;
+  isolation: isolate;
+  background:
+    radial-gradient(120% 120% at 30% 22%, #26356b 0%, #131a35 46%, #090c18 100%);
+  box-shadow:
+    inset 0 -18px 40px -18px rgba(0, 0, 0, 0.9),
+    inset 0 12px 30px -12px rgba(255, 255, 255, 0.22);
+}
+
+.orb-blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(18px);
+  will-change: transform;
+  mix-blend-mode: screen;
+}
+.orb-blob.b1 {
+  inset: 12% 30% 44% 12%;
+  background: radial-gradient(circle, var(--wine) 0%, transparent 70%);
+  opacity: 0.95;
+  animation: orb-drift-a 13s var(--ease) infinite alternate;
+}
+.orb-blob.b2 {
+  inset: 38% 10% 12% 34%;
+  background: radial-gradient(circle, #37b6ff 0%, transparent 70%);
+  opacity: 0.8;
+  animation: orb-drift-b 17s var(--ease) infinite alternate;
+}
+.orb-blob.b3 {
+  inset: 28% 34% 34% 26%;
+  background: radial-gradient(circle, #8f6bff 0%, transparent 68%);
+  opacity: 0.7;
+  animation: orb-drift-c 21s var(--ease) infinite alternate;
+}
+/* Non-multiple durations, so the three never line back up. */
+@keyframes orb-drift-a {
+  0%   { transform: translate(0, 0) scale(1); }
+  50%  { transform: translate(26%, 22%) scale(1.22); }
+  100% { transform: translate(-14%, 34%) scale(0.94); }
+}
+@keyframes orb-drift-b {
+  0%   { transform: translate(0, 0) scale(1.05); }
+  50%  { transform: translate(-28%, -20%) scale(0.88); }
+  100% { transform: translate(16%, -30%) scale(1.18); }
+}
+@keyframes orb-drift-c {
+  0%   { transform: translate(0, 0) scale(0.9); }
+  50%  { transform: translate(22%, -26%) scale(1.25); }
+  100% { transform: translate(-24%, 18%) scale(1); }
+}
+
+/* A faint speckle so the gradients do not band on wide screens. */
+.orb-grain {
+  position: absolute; inset: 0;
+  background-image: radial-gradient(rgba(255, 255, 255, 0.5) 0.5px, transparent 0.5px);
+  background-size: 3px 3px;
+  opacity: 0.06;
+  mix-blend-mode: overlay;
+}
+
+/* The highlight that turns a disc into a sphere. */
+.orb-gloss {
+  position: absolute; inset: 0;
+  background:
+    radial-gradient(60% 45% at 32% 20%, rgba(255, 255, 255, 0.55) 0%, rgba(255, 255, 255, 0.06) 45%, transparent 62%),
+    radial-gradient(38% 26% at 68% 84%, rgba(120, 190, 255, 0.28) 0%, transparent 70%);
+}
+.orb-rim {
+  position: absolute; inset: 0;
+  border-radius: 50%;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18);
+}
+
+/* Light thrown onto the page behind it. */
+.orb-glow {
+  position: absolute; inset: -22%;
+  border-radius: 50%;
+  background: radial-gradient(circle, color-mix(in srgb, var(--wine) 42%, transparent) 0%, transparent 62%);
+  filter: blur(26px);
+  opacity: 0.55;
+  animation: orb-breathe 7s ease-in-out infinite;
+}
+@keyframes orb-breathe {
+  0%, 100% { transform: scale(1); opacity: 0.45; }
+  50%      { transform: scale(1.1); opacity: 0.7; }
+}
+
+.orb-ring {
+  position: absolute; inset: -7%;
+  border-radius: 50%;
+  border: 1px solid color-mix(in srgb, var(--wine) 30%, transparent);
+  animation: orb-spin 26s linear infinite;
+  border-block-start-color: transparent;
+  border-inline-end-color: transparent;
+}
+@keyframes orb-spin { to { transform: rotate(360deg); } }
+
+.orb.busy .orb-blob { animation-duration: 4s, 5s, 6s; }
+
+@media (prefers-reduced-motion: reduce) {
+  /* The sphere stays; only the drift stops. */
+  .orb-blob, .orb-glow, .orb-ring { animation: none; }
+}
+
 /* ── Assistant console ─────────────────────────────────────
    The page asks the questions instead of waiting to be typed at, so it is
    laid out as a panel of steps rather than a transcript. The glow and the
    grid come from brand tokens, so both themes get them for free.
    ───────────────────────────────────────────────────────── */
 .console { padding-block: var(--s5) var(--s7); position: relative; }
+.console-stage { display: grid; justify-items: center; gap: var(--s5); padding-block: var(--s4) var(--s6); }
+.console-say {
+  max-width: 42ch; text-align: center;
+  color: var(--ink-70); font-size: var(--t-sm); line-height: 1.9;
+}
+.quiz > .orb { margin-block-end: var(--s4); }
 .console-head { position: relative; margin-block-end: var(--s5); }
 .console-head h1 { font-size: var(--t-h1); margin-block-start: var(--s2); }
 .console-exit {
@@ -1225,6 +1368,7 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
   .cats { grid-template-columns: repeat(3, 1fr); }
   .rail { grid-auto-columns: 30%; gap: var(--s4); }
+  .voices { grid-auto-columns: 38%; }
   .pdp { grid-template-columns: 1.05fr 1fr; gap: var(--s7); align-items: start; }
   .footer-cols { grid-template-columns: 2fr 1fr 1fr 1fr; }
   .kpis { grid-template-columns: repeat(4, 1fr); }

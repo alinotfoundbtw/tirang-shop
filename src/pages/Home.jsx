@@ -5,8 +5,72 @@ import Hero from '../components/Hero';
 import CategoryMark from '../components/CategoryMark';
 import ProductCard from '../components/ProductCard';
 import QuickView from '../components/QuickView';
+import { reviews } from '../data/reviews';
 import { useSeo } from '../lib/seo';
 import { fa } from '../lib/format';
+
+/** A horizontal strip of products. Scroll-snap, never auto-advancing —
+ *  a rail that moves on its own is a rail you cannot read.
+ *
+ *  Below four items there is nothing to scroll, and a rail holding two cards
+ *  reads as a broken rail rather than a short one. Those fall back to the
+ *  ordinary grid, which looks deliberate at any count. */
+const RAIL_MIN = 4;
+
+function Rail({ title, note, to, items, onQuickView, eager = false }) {
+  if (!items?.length) return null;
+  const scrolls = items.length >= RAIL_MIN;
+  return (
+    <section className="section wrap">
+      <div className="section-head">
+        <div>
+          <h2>{title}</h2>
+          {note && <p className="section-note">{note}</p>}
+        </div>
+        <Link to={to} className="link-more">همه</Link>
+      </div>
+      <div className={scrolls ? 'rail' : 'grid-products'}>
+        {items.map((p, i) => (
+          <ProductCard key={p.id} product={p} eager={eager && i < 2} onQuickView={onQuickView} />
+        ))}
+      </div>
+      {scrolls && <p className="rail-hint">{fa(items.length)} مدل — برای دیدن بقیه بکشید</p>}
+    </section>
+  );
+}
+
+/** A few review lines, pulled from the same sample data the product pages
+ *  show. Labelled there and labelled here. */
+function VoicesStrip() {
+  const picks = reviews.filter((r) => r.rating === 5).slice(0, 6);
+  return (
+    <section className="section wrap">
+      <div className="section-head">
+        <div>
+          <h2>مشتری‌ها چه گفتند</h2>
+          <p className="section-note">نمونه — برای نمایش قالب</p>
+        </div>
+      </div>
+      <div className="rail voices">
+        {picks.map((r) => {
+          const p = products.find((x) => x.id === r.product);
+          return (
+            <blockquote className="voice" key={r.id}>
+              <p>{r.body}</p>
+              <footer>
+                <span className="voice-avatar" aria-hidden="true">{r.name.trim()[0]}</span>
+                <span>
+                  <b>{r.name}</b>
+                  {p && <small>{p.name}</small>}
+                </span>
+              </footer>
+            </blockquote>
+          );
+        })}
+      </div>
+    </section>
+  );
+}
 
 export default function Home() {
   useSeo({
@@ -17,8 +81,17 @@ export default function Home() {
 
   const [quick, setQuick] = useState(null);
 
-  const fresh = products.filter((p) => p.new).slice(0, 6);
-  const best = [...products].sort((a, b) => b.sales - a.sales).slice(0, 4);
+  /* Rails carry the whole catalog rather than a handful. They are scroll-snap
+     strips, not carousels — nothing here advances on its own, so a long rail
+     costs a swipe, not attention. `new` first inside each so the rail opens on
+     something the shopper has not seen. */
+  const byNewThenSales = (a, b) => Number(b.new) - Number(a.new) || b.sales - a.sales;
+  const best = [...products].sort((a, b) => b.sales - a.sales);
+  const fresh = [...products].sort(byNewThenSales);
+  const affordable = products.filter((p) => p.price <= 500000).sort(byNewThenSales);
+  const loose = products.filter((p) => String(p.fit).includes('اورسایز') || p.tags.includes('اورسایز')).sort(byNewThenSales);
+  const packs = products.filter((p) => p.category === 'pack' || p.tags.includes('پک') || p.tags.includes('ست'));
+  const forThem = products.filter((p) => p.category === 'kids' || p.category === 'women').sort(byNewThenSales);
 
   return (
     <>
@@ -29,7 +102,7 @@ export default function Home() {
         <div className="cats">
           {categories.map((c) => (
             <Link key={c.slug} to={`/products?cat=${c.slug}`} className="cat">
-              <span className="cat-mark"><CategoryMark slug={c.slug} /></span>
+              <span className="cat-mark"><CategoryMark slug={c.slug} size={24} /></span>
               <b>{c.name}</b>
               <span className="cat-note">{c.note}</span>
               <span className="cat-count num">
@@ -40,17 +113,14 @@ export default function Home() {
         </div>
       </section>
 
-      <section className="section wrap">
-        <div className="section-head">
-          <h2>پرفروش‌ها</h2>
-          <Link to="/products" className="link-more">همه</Link>
-        </div>
-        <div className="grid-products">
-          {best.map((p, i) => (
-            <ProductCard key={p.id} product={p} eager={i < 2} onQuickView={setQuick} />
-          ))}
-        </div>
-      </section>
+      <Rail
+        title="پرفروش‌ها"
+        note="به ترتیب چیزی که بیشتر از همه فروخته"
+        to="/products?sort=best"
+        items={best}
+        onQuickView={setQuick}
+        eager
+      />
 
       <section className="section wrap">
         <div
@@ -76,19 +146,47 @@ export default function Home() {
         </div>
       </section>
 
-      {fresh.length > 0 && (
-        <section className="section wrap">
-          <div className="section-head">
-            <h2>تازه رسیده</h2>
-            <Link to="/products?sort=new" className="link-more">بیشتر</Link>
-          </div>
-          <div className="rail">
-            {fresh.map((p) => (
-              <ProductCard key={p.id} product={p} onQuickView={setQuick} />
-            ))}
-          </div>
-        </section>
-      )}
+      <Rail
+        title="تازه رسیده"
+        note="آخرین چیزهایی که به کمد اضافه شد"
+        to="/products?sort=new"
+        items={fresh}
+        onQuickView={setQuick}
+      />
+
+      <Rail
+        title="زیر ۵۰۰ هزار تومان"
+        note="همان پارچه، قیمت کمتر"
+        to="/products?sort=cheap"
+        items={affordable}
+        onQuickView={setQuick}
+      />
+
+      <Rail
+        title="گشاد و راحت"
+        note="تن‌خور آزاد، شانهٔ افتاده"
+        to="/products?fit=اورسایز"
+        items={loose}
+        onQuickView={setQuick}
+      />
+
+      <Rail
+        title="پک‌ها و ست‌ها"
+        note="دو یا سه تیشرت، ارزان‌تر از جدا"
+        to="/products?cat=pack"
+        items={packs}
+        onQuickView={setQuick}
+      />
+
+      <Rail
+        title="زنانه و بچگانه"
+        note="برش زنانه و نخ نرم بچگانه"
+        to="/products?cat=women"
+        items={forThem}
+        onQuickView={setQuick}
+      />
+
+      <VoicesStrip />
 
       {quick && <QuickView product={quick} onClose={() => setQuick(null)} />}
     </>
