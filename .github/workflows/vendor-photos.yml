@@ -1,0 +1,23 @@
+# Fetches the catalog photos on a runner and hands them back as an artifact.
+#
+# Needed because images.pexels.com is unreachable from Iran, where this shop is
+# developed, so the photos cannot be vendored from a workstation. Run this once
+# after adding products, download the artifact, and commit public/photos/.
+name: Vendor product photos
+
+on: workflow_dispatch
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - run: node scripts/fetch-photos.mjs
+      - uses: actions/upload-artifact@v4
+        with:
+          name: photos
+          path: public/photos
+          if-no-files-found: error
