@@ -1,11 +1,19 @@
 /* Catalog for «تیرنگ» — a plain-and-graphic tee shop.
 
-   Photos are real, hotlink-friendly Pexels URLs. Every colorway carries its own
-   photo set, which is what makes the swatch→image swap real rather than a tint
-   filter. Swap `photos` for your own CDN and nothing else changes. */
+   Photos are served from our own origin, not hotlinked. images.pexels.com is
+   unreachable from Iran without a VPN — which is most of this shop's customers
+   — so hotlinking showed them a grid of "تصویر بارگذاری نشد" boxes. The files
+   live in public/photos/ and are refreshed by scripts/fetch-photos.mjs.
 
+   Every colorway carries its own photo set, which is what makes the
+   swatch→image swap real rather than a tint filter. */
+
+/* BASE_URL keeps this right under GitHub Pages, which serves the site from
+   /tirang-shop/ rather than the domain root.
+   The extension follows what fetch-photos.mjs wrote: Pexels' compressor
+   returns JPEG for everything except the two shots requested as PNG. */
 const px = (id, ext = 'jpeg') =>
-  `https://images.pexels.com/photos/${id}/pexels-photo-${id}.${ext}?auto=compress&cs=tinysrgb&w=900`;
+  `${import.meta.env.BASE_URL}photos/${id}.${ext === 'png' ? 'png' : 'jpg'}`;
 
 export const SIZES = ['S', 'M', 'L', 'XL', 'XXL'];
 
