@@ -1862,6 +1862,176 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   @keyframes boot { from { opacity: 0; } }
 }
 
+/* ── The parcel's journey ──────────────────────────────────
+   One rail behind four nodes, filled to wherever the parcel is. The old
+   version was four bulleted rows, which showed the states but never the
+   distance between them — and the distance is the whole question.
+   ───────────────────────────────────────────────────────── */
+.track2 {
+  list-style: none; padding: 0; margin-block: var(--s5) var(--s4);
+  position: relative;
+  display: grid; grid-auto-flow: column; grid-auto-columns: 1fr;
+  gap: var(--s2);
+}
+/* Behind the nodes, inset by half a column so it starts and ends on centres. */
+.track2-rail {
+  position: absolute; inset-block-start: 21px;
+  inset-inline: calc(100% / 8) calc(100% / 8);
+  block-size: 3px; border-radius: var(--r-full);
+  background: var(--line); overflow: hidden;
+}
+.track2-rail i {
+  display: block; block-size: 100%;
+  background: linear-gradient(to left, var(--wine), color-mix(in srgb, var(--wine) 55%, var(--cherry)));
+  border-radius: var(--r-full);
+  transition: inline-size 0.6s var(--ease);
+}
+.track2 li {
+  position: relative; z-index: 1;
+  display: grid; justify-items: center; gap: 4px; text-align: center;
+  min-width: 0;
+}
+.track2-node {
+  inline-size: 42px; block-size: 42px; border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  color: var(--ink-45);
+  transition: background 0.3s var(--ease), border-color 0.3s var(--ease), color 0.3s var(--ease);
+}
+.track2 li.done .track2-node { background: var(--wine); border-color: var(--wine); color: #fff; }
+.track2 li.now .track2-node {
+  background: var(--surface); border-color: var(--wine); color: var(--wine);
+  box-shadow: 0 0 0 5px var(--wine-soft);
+}
+@media (prefers-reduced-motion: no-preference) {
+  .track2 li.now .track2-node { animation: node-pulse 2.4s var(--ease) infinite; }
+  @keyframes node-pulse {
+    0%, 100% { box-shadow: 0 0 0 5px var(--wine-soft); }
+    50% { box-shadow: 0 0 0 9px color-mix(in srgb, var(--wine) 8%, transparent); }
+  }
+}
+.track2 b { font-size: var(--t-xs); font-weight: 600; line-height: 1.4; }
+.track2 li.todo b { color: var(--ink-45); font-weight: 400; }
+.track2 small { font-size: 10px; color: var(--ink-45); }
+.track2 p { font-size: var(--t-xs); color: var(--ink-70); line-height: 1.6; margin-block-start: 2px; }
+.track2.compact { margin-block: var(--s3); }
+.track2.compact .track2-node { inline-size: 34px; block-size: 34px; }
+.track2.compact .track2-rail { inset-block-start: 17px; }
+
+.track-canceled {
+  display: flex; align-items: center; gap: var(--s3);
+  padding: var(--s4); margin-block: var(--s4);
+  border-radius: var(--r-md);
+  background: var(--cherry-soft); color: var(--cherry);
+}
+.track-mark {
+  inline-size: 38px; block-size: 38px; border-radius: var(--r-full);
+  display: grid; place-items: center; flex: none;
+  background: var(--cherry); color: #fff;
+}
+.track-canceled b { display: block; font-size: var(--t-sm); }
+.track-canceled small { font-size: var(--t-xs); opacity: 0.75; }
+
+/* ── The panel, dressed ────────────────────────────────────
+   It was a stack of white rectangles on a white page. The shell now has its
+   own ground so the cards read as cards, and the sidebar looks like part of
+   an application rather than a list of links that happens to be there.
+   ───────────────────────────────────────────────────────── */
+.admin { background: var(--blush); }
+.admin-side {
+  background: var(--surface);
+  border-inline-end: 1px solid var(--line);
+}
+.admin-side nav a {
+  display: flex; align-items: center; gap: var(--s2);
+  border-radius: var(--r-md);
+  transition: background 0.18s var(--ease), color 0.18s var(--ease);
+}
+.admin-side nav a:hover { background: var(--blush); color: var(--ink); }
+.admin-side nav a.active { background: var(--wine); color: #fff; }
+
+.admin-main { background: var(--blush); }
+.admin-main > h1 { letter-spacing: -0.02em; }
+
+.panel {
+  border-radius: var(--r-lg);
+  box-shadow: 0 1px 2px rgba(20, 22, 27, 0.04);
+}
+.panel > h3 {
+  display: flex; align-items: center; gap: var(--s2);
+  font-size: var(--t-sm); color: var(--ink);
+  padding-block-end: var(--s3); margin-block-end: var(--s4);
+  border-block-end: 1px solid var(--line);
+}
+
+/* KPI tiles get a colour and a shape instead of being four grey boxes. */
+.kpi {
+  position: relative; overflow: hidden;
+  border-radius: var(--r-lg);
+  padding: var(--s4) var(--s4) var(--s5);
+  box-shadow: 0 1px 2px rgba(20, 22, 27, 0.04);
+}
+.kpi::after {
+  content: ''; position: absolute;
+  inset-block-start: 0; inset-inline-start: 0;
+  inline-size: 3px; block-size: 100%;
+  background: var(--wine);
+}
+.kpi:nth-child(2)::after { background: var(--cherry); }
+.kpi:nth-child(3)::after { background: var(--ok); }
+.kpi:nth-child(4)::after { background: var(--warn); }
+.kpi small { font-size: var(--t-xs); color: var(--ink-45); }
+.kpi b { font-size: 1.6rem; letter-spacing: -0.02em; }
+
+/* ── The profile, dressed ──────────────────────────────── */
+.profile-head {
+  position: relative; overflow: hidden;
+  padding: var(--s5) var(--s4);
+  border-radius: var(--r-lg);
+  border: 1px solid var(--line);
+  background:
+    radial-gradient(120% 140% at 100% 0%, var(--wine-soft), transparent 60%),
+    var(--surface);
+}
+.profile-avatar {
+  inline-size: 60px; block-size: 60px;
+  background: var(--wine); color: #fff;
+  box-shadow: 0 6px 18px -8px var(--wine);
+}
+.profile-head h1 { font-size: 1.35rem; letter-spacing: -0.02em; }
+.profile-since { font-size: var(--t-xs); color: var(--ink-45); }
+
+.profile-stats {
+  display: grid; grid-template-columns: repeat(3, 1fr);
+  gap: var(--s2); margin-block: var(--s4) 0;
+}
+.profile-stats div {
+  padding: var(--s3); border-radius: var(--r-md);
+  background: var(--blush); text-align: center;
+}
+.profile-stats b { display: block; font-family: var(--font-display); font-size: 1.15rem; }
+.profile-stats small { font-size: 10px; color: var(--ink-45); }
+
+.profile .panel { background: var(--surface); }
+.profile-tabs button { transition: background 0.18s var(--ease), color 0.18s var(--ease); }
+
+.address-list li {
+  position: relative;
+  background: var(--surface);
+  transition: border-color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+}
+.address-list li.on { box-shadow: 0 0 0 3px var(--wine-soft); }
+
+.notify-list li {
+  padding: var(--s3); border-radius: var(--r-md);
+  background: var(--blush);
+}
+
+@media (min-width: 700px) {
+  .track2 p { min-height: 2.6em; }
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (min-width: 700px) {
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }

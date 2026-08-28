@@ -21,32 +21,35 @@ import { fa } from './format.js';
 
 const KEY = 'tirang.orders.v1';
 
-/** The pipeline, in order. Each step declares what it needs to be entered. */
+/**
+ * The pipeline, in order.
+ *
+ * It starts at «پرداخت شده», not at «در انتظار پرداخت». An order only exists
+ * once the gateway has taken the money and handed back a reference — there is
+ * no route through this shop that produces an unpaid order, so a shop-side
+ * "mark as paid" was a button for a thing that never happens. Payment is the
+ * gateway's to report; everything after it is the shop's to do.
+ *
+ * Each step declares what it costs to enter, and `by` says whose move it is:
+ * anything marked 'gateway' is never offered to the panel.
+ */
 export const FLOW = [
-  {
-    key: 'wait',
-    title: 'در انتظار پرداخت',
-    short: 'پرداخت نشده',
-    tone: 'wait',
-    customer: 'سفارش ثبت شد و منتظر پرداخت است.',
-  },
   {
     key: 'paid',
     title: 'پرداخت شد',
-    short: 'پرداخت شده',
+    short: 'سفارش تازه',
     tone: 'paid',
-    // The gateway's own reference. Without it there is nothing to reconcile
-    // against the bank statement, and no way to answer "I paid, where is it?"
-    needs: [
-      { name: 'ref', label: 'کد پیگیری پرداخت', hint: 'کدی که درگاه بعد از پرداخت می‌دهد', required: true, dir: 'ltr' },
-    ],
-    customer: 'پرداخت تأیید شد.',
+    by: 'gateway',
+    icon: 'card',
+    customer: 'پرداخت تأیید شد و سفارش ثبت شد.',
   },
   {
     key: 'packing',
     title: 'در حال آماده‌سازی',
     short: 'آماده‌سازی',
     tone: 'wait',
+    by: 'shop',
+    icon: 'box',
     needs: [{ name: 'note', label: 'یادداشت (اختیاری)', hint: 'مثلاً: چاپ سفارشی، دو روز کاری' }],
     customer: 'سفارش در حال بسته‌بندی است.',
   },
@@ -55,6 +58,8 @@ export const FLOW = [
     title: 'ارسال شد',
     short: 'ارسال شده',
     tone: 'sent',
+    by: 'shop',
+    icon: 'truck',
     needs: [
       { name: 'carrier', label: 'شرکت پست', required: true, options: ['پست پیشتاز', 'تیپاکس', 'چاپار', 'ماهکس', 'پیک تهران'] },
       { name: 'tracking', label: 'کد رهگیری مرسوله', hint: 'همان کدی که روی رسید پست است', required: true, dir: 'ltr' },
@@ -66,6 +71,8 @@ export const FLOW = [
     title: 'تحویل شد',
     short: 'تحویل شده',
     tone: 'paid',
+    by: 'shop',
+    icon: 'home',
     needs: [{ name: 'receiver', label: 'تحویل‌گیرنده', hint: 'اسم کسی که بسته را گرفته', required: true }],
     customer: 'بسته تحویل داده شد.',
   },
@@ -115,10 +122,12 @@ function seed() {
     subtotal: o.total,
     shipping: 0,
     total: o.total,
-    payment: o.status === 'wait' ? null : { ref: refCode(), at: nowISO() },
+    payment: { ref: refCode(), at: nowISO() },
     shipment: o.status === 'sent' ? { carrier: 'پست پیشتاز', tracking: `IR${Date.now().toString().slice(-11)}`, at: nowISO() } : null,
-    status: o.status,
-    history: [{ at: nowISO(), status: o.status, by: 'seed' }],
+    // 'wait' is gone from the pipeline; those rows start where every real
+    // order starts.
+    status: o.status === 'wait' ? 'paid' : o.status,
+    history: [{ at: nowISO(), status: 'paid', by: 'gateway' }],
   }));
   return write(list);
 }
@@ -150,10 +159,7 @@ export function placeOrder({ customer, address, lines, subtotal, shipping }) {
     payment: { ref, at: nowISO() },
     shipment: null,
     status: 'paid',
-    history: [
-      { at: nowISO(), status: 'wait', by: 'customer' },
-      { at: nowISO(), status: 'paid', by: 'gateway', info: { ref } },
-    ],
+    history: [{ at: nowISO(), status: 'paid', by: 'gateway', info: { ref } }],
   };
   write([order, ...list]);
   return order;
@@ -185,7 +191,6 @@ export function advanceOrder(id, info = {}) {
     status: step.key,
     history: [...order.history, { at, status: step.key, by: 'shop', info }],
   };
-  if (step.key === 'paid') updated.payment = { ref: info.ref.trim(), at };
   if (step.key === 'sent') updated.shipment = { carrier: info.carrier, tracking: info.tracking.trim(), at };
   if (step.key === 'delivered') updated.deliveredTo = info.receiver.trim();
 

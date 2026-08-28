@@ -1,5 +1,6 @@
 import { Link, Navigate, useParams } from 'react-router-dom';
-import { FLOW, STEP, stepIndex, ordersFor, orderById } from '../lib/orders';
+import { STEP, ordersFor, orderById } from '../lib/orders';
+import Track from '../components/Track';
 import { useAccount } from '../lib/account';
 import { useSeo } from '../lib/seo';
 import { toman, fa } from '../lib/format';
@@ -89,8 +90,6 @@ export function OrderDetail() {
     );
   }
 
-  const done = stepIndex(order.status);
-  const canceled = order.status === 'canceled';
 
   return (
     <div className="wrap orders">
@@ -98,25 +97,7 @@ export function OrderDetail() {
       <h1 className="num">سفارش {order.id}</h1>
       <p className="muted">ثبت شده در {when(order.createdAt)}</p>
 
-      {canceled ? (
-        <div className="panel"><p className="panel-empty">این سفارش لغو شده است.</p></div>
-      ) : (
-        <ol className="track">
-          {FLOW.map((s, i) => {
-            const hit = order.history.find((h) => h.status === s.key);
-            return (
-              <li key={s.key} className={i < done ? 'done' : i === done ? 'now' : ''}>
-                <span className="track-dot" aria-hidden="true" />
-                <div>
-                  <b>{s.title}</b>
-                  {hit ? <small>{when(hit.at)}</small> : <small className="muted">هنوز نه</small>}
-                  {i <= done && <p>{s.customer}</p>}
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-      )}
+      <Track order={order} />
 
       <div className="panel">
         <h3>کدها</h3>

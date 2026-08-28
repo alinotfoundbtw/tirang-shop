@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
-import { allOrders, advanceOrder, cancelOrder, nextStep, STEP, FLOW, stepIndex } from '../lib/orders';
+import { allOrders, advanceOrder, cancelOrder, nextStep, STEP } from '../lib/orders';
+import Track from '../components/Track';
 import { useShop } from '../lib/store';
 import { toman, fa } from '../lib/format';
 
@@ -24,13 +25,15 @@ const art = {
 
 const when = (iso) => new Date(iso).toLocaleDateString('fa-IR', { day: 'numeric', month: 'long' });
 
+/* «پرداخت نشده» is not a filter because it is not a state anything can be
+   in: an order reaches this panel only after the gateway has taken the money. */
 const FILTERS = [
   ['all', 'همه'],
-  ['wait', 'پرداخت نشده'],
-  ['paid', 'پرداخت شده'],
+  ['paid', 'سفارش تازه'],
   ['packing', 'آماده‌سازی'],
   ['sent', 'ارسال شده'],
   ['delivered', 'تحویل شده'],
+  ['canceled', 'لغو شده'],
 ];
 
 export default function Orders() {
@@ -44,9 +47,7 @@ export default function Orders() {
     [rows, filter]
   );
 
-  const revenue = rows
-    .filter((o) => o.status !== 'wait' && o.status !== 'canceled')
-    .reduce((s, o) => s + o.total, 0);
+  const revenue = rows.filter((o) => o.status !== 'canceled').reduce((s, o) => s + o.total, 0);
 
   const refresh = () => setRows(allOrders());
 
@@ -109,7 +110,6 @@ function OrderCard({ order, open, onToggle, onMove, onCancel }) {
   const [info, setInfo] = useState({});
   const [error, setError] = useState('');
   const canceled = order.status === 'canceled';
-  const done = stepIndex(order.status);
 
   const submit = (e) => {
     e.preventDefault();
@@ -180,20 +180,7 @@ function OrderCard({ order, open, onToggle, onMove, onCancel }) {
           </ul>
 
           <h4>مسیر</h4>
-          <ol className="track compact">
-            {FLOW.map((s, i) => {
-              const hit = order.history.find((h) => h.status === s.key);
-              return (
-                <li key={s.key} className={i < done ? 'done' : i === done && !canceled ? 'now' : ''}>
-                  <span className="track-dot" aria-hidden="true" />
-                  <div>
-                    <b>{s.title}</b>
-                    {hit && <small>{when(hit.at)}</small>}
-                  </div>
-                </li>
-              );
-            })}
-          </ol>
+          <Track order={order} compact />
 
           {!canceled && next && (
             <form className="advance" onSubmit={submit}>

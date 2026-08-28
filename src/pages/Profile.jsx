@@ -1,8 +1,9 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
 import { allProducts } from '../lib/catalog';
-import { useAccount, validPhone } from '../lib/account';
+import { useAccount, validPhone, validPostal } from '../lib/account';
 import { useShop } from '../lib/store';
+import { ordersFor } from '../lib/orders';
 import { useSeo } from '../lib/seo';
 import { fa } from '../lib/format';
 
@@ -46,17 +47,30 @@ export default function Profile() {
 
   if (!acc.signedIn) return <Navigate to="/enter" replace />;
 
+  const myOrders = ordersFor(acc.user.phone);
+
   return (
     <div className="wrap profile">
       <header className="profile-head">
-        <span className="profile-avatar" aria-hidden="true">{acc.user.name.trim()[0]}</span>
-        <div>
-          <h1>{acc.user.name}</h1>
-          <p className="muted num">{fa(acc.user.phone)}</p>
+        <div className="row" style={{ gap: 'var(--s3)', alignItems: 'center' }}>
+          <span className="profile-avatar" aria-hidden="true">{acc.user.name.trim()[0]}</span>
+          <div className="grow" style={{ minWidth: 0 }}>
+            <h1>{acc.user.name}</h1>
+            <p className="muted num">{fa(acc.user.phone)}</p>
+            <p className="profile-since">
+              عضو از {new Date(acc.user.joined).toLocaleDateString('fa-IR', { month: 'long', year: 'numeric' })}
+            </p>
+          </div>
+          <button className="btn btn-ghost" onClick={() => { acc.signOut(); toast('خارج شدی', 'warn'); }}>
+            خروج
+          </button>
         </div>
-        <button className="btn btn-ghost" onClick={() => { acc.signOut(); toast('خارج شدی', 'warn'); }}>
-          خروج
-        </button>
+
+        <div className="profile-stats">
+          <div><b className="num">{fa(myOrders.length)}</b><small>سفارش</small></div>
+          <div><b className="num">{fa(acc.addresses.length)}</b><small>آدرس</small></div>
+          <div><b className="num">{fa(acc.myReviews.length)}</b><small>نظر</small></div>
+        </div>
       </header>
 
       <nav className="profile-tabs" aria-label="بخش‌های پروفایل">
@@ -149,6 +163,7 @@ function AddressTab({ acc, toast }) {
     if (!validPhone(draft.phone)) return setError('شمارهٔ تماس باید با ۰۹ شروع شود و ۱۱ رقم باشد.');
     if (draft.city.trim().length < 2) return setError('شهر را بنویس.');
     if (draft.street.trim().length < 6) return setError('نشانی را کامل‌تر بنویس.');
+    if (!validPostal(draft.postal)) return setError('کدپستی باید دقیقاً ۱۰ رقم باشد.');
     acc.saveAddress(draft);
     toast(draft.id ? 'آدرس به‌روز شد' : 'آدرس اضافه شد');
     setDraft(null);
@@ -185,7 +200,8 @@ function AddressTab({ acc, toast }) {
               </div>
               <p>{a.province} · {a.city}</p>
               <p className="muted">{a.street}</p>
-              <p className="muted num">{a.receiver} — {fa(a.phone)}{a.postal && <> · کدپستی {fa(a.postal)}</>}</p>
+              <p className="muted num">{a.receiver} — {fa(a.phone)}</p>
+              <p className="muted num">کدپستی {fa(a.postal)}</p>
               <div className="address-actions">
                 <button className="btn-quiet" style={{ fontSize: 'var(--t-xs)' }} onClick={() => { setDraft(a); setError(''); }}>ویرایش</button>
                 <button
@@ -234,8 +250,11 @@ function AddressTab({ acc, toast }) {
                 <input className="field" value={draft.city} onChange={set('city')} />
               </label>
               <label>
-                <span className="label">کدپستی <small className="muted">(اختیاری)</small></span>
-                <input className="field num" value={draft.postal} onChange={set('postal')} inputMode="numeric" dir="ltr" />
+                <span className="label">کدپستی <small className="muted">(۱۰ رقم)</small></span>
+                <input
+                  className="field num" value={draft.postal} onChange={set('postal')}
+                  inputMode="numeric" dir="ltr" maxLength={10} placeholder="۱۹۳۹۹۵۴۸۵۱"
+                />
               </label>
             </div>
             <label>

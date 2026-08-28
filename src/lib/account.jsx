@@ -55,6 +55,11 @@ export const normalizePhone = (raw = '') => {
 
 export const validPhone = (raw) => /^09\d{9}$/.test(normalizePhone(raw));
 
+/* Iran's postal code is exactly ten digits. It is what the courier's system
+   actually routes on, so an address without one is an address the parcel
+   cannot be booked against — which is why it is required, not optional. */
+export const validPostal = (raw) => /^\d{10}$/.test(normalizePhone(raw));
+
 const uid = () => Math.random().toString(36).slice(2, 10);
 
 export function AccountProvider({ children }) {
