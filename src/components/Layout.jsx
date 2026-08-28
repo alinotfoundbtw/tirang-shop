@@ -96,11 +96,15 @@ export default function Layout() {
             تیرنگ <small>TIRANG</small>
           </Link>
 
+          {/* Four destinations, not a category list. NavLink matches on path and
+              ignores the query, so three links to /products all lit up at once
+              — every one of them "active" on any products page. Categories
+              belong in the filter row on that page, where they already are. */}
           <nav className="nav-desktop" aria-label="اصلی">
-            <NavLink to="/products" end>همهٔ تیشرت‌ها</NavLink>
-            <NavLink to="/products?cat=oversize">اورسایز</NavLink>
-            <NavLink to="/products?cat=graphic">طرح‌دار</NavLink>
+            <NavLink to="/" end>خانه</NavLink>
+            <NavLink to="/products">تیشرت‌ها</NavLink>
             <NavLink to="/ask">مشاور خرید</NavLink>
+            <NavLink to="/faq">راهنما</NavLink>
           </nav>
 
           <div className="header-actions">

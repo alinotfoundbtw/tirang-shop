@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categories } from '../data/products';
-import { removeProduct, isCustom } from '../lib/catalog';
+import { removeProduct, isCustom, isEdited, resetProduct } from '../lib/catalog';
 import { useCatalog } from '../lib/useCatalog';
 import { normalize } from '../lib/rag';
 import { useShop } from '../lib/store';
@@ -24,6 +24,10 @@ export function Catalog() {
   const { toast } = useShop();
   const list = useCatalog();
   const [open, setOpen] = useState(false);
+  /* Editing is a mode you enter on purpose, not a stepper sitting in the row.
+     The old ± buttons meant a mis-tap on a phone silently changed stock, and
+     nothing on screen said it had. */
+  const [editing, setEditing] = useState(null);
   const [q, setQ] = useState('');
 
   const needle = normalize(q);
@@ -47,10 +51,20 @@ export function Catalog() {
         </button>
       </div>
 
-      {open && (
+      {open && !editing && (
         <div className="panel">
           <h3>محصول تازه</h3>
           <ProductForm onDone={() => setOpen(false)} onCancel={() => setOpen(false)} />
+        </div>
+      )}
+
+      {editing && (
+        <div className="panel">
+          <h3>ویرایش «{editing.name}»</h3>
+          <p className="muted" style={{ fontSize: 'var(--t-sm)', marginBlockEnd: 'var(--s4)' }}>
+            قیمت، موجودی هر سایز، رنگ‌ها، عکس‌ها و متن — همه قابل تغییرند. نشانی محصول عوض نمی‌شود.
+          </p>
+          <ProductForm editing={editing} onDone={() => setEditing(null)} onCancel={() => setEditing(null)} />
         </div>
       )}
 
@@ -78,6 +92,7 @@ export function Catalog() {
                     <b>
                       <Link to={`/p/${p.slug}`}>{p.name}</Link>
                       {own && <span className="badge badge-new">افزودهٔ شما</span>}
+                      {!own && isEdited(p.id) && <span className="badge">ویرایش‌شده</span>}
                     </b>
                     <small>
                       {categories.find((c) => c.slug === p.category)?.name} · {p.fit} ·{' '}
@@ -85,14 +100,28 @@ export function Catalog() {
                     </small>
                   </span>
                   <b className="num prod-price">{toman(p.price, { unit: false })}</b>
-                  {own && (
-                    <button
-                      className="btn-quiet danger"
-                      onClick={() => { removeProduct(p.id); toast(`«${p.name}» حذف شد`, 'warn'); }}
-                    >
-                      حذف
+                  <span className="prod-actions">
+                    <button className="btn-quiet" onClick={() => { setEditing(p); setOpen(false); }}>
+                      ویرایش
                     </button>
-                  )}
+                    {own ? (
+                      <button
+                        className="btn-quiet danger"
+                        onClick={() => { removeProduct(p.id); toast(`«${p.name}» حذف شد`, 'warn'); }}
+                      >
+                        حذف
+                      </button>
+                    ) : (
+                      isEdited(p.id) && (
+                        <button
+                          className="btn-quiet"
+                          onClick={() => { resetProduct(p.id); toast(`«${p.name}» به حالت اولیه برگشت`, 'warn'); }}
+                        >
+                          بازگردانی
+                        </button>
+                      )
+                    )}
+                  </span>
                 </li>
               );
             })}

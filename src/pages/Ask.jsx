@@ -194,14 +194,14 @@ export default function Ask() {
           <button className="track" onClick={() => setTrack('find')}>
             <span className="track-art"><Icon d={art.spark} size={26} /></span>
             <b>تیشرت پیدا کن</b>
-            <small>پنج سؤال، و بعد فقط چیزهایی که اندازه و رنگش واقعاً موجود است.</small>
-            <span className="track-go"><Icon d={art.chevron} size={16} /></span>
+            <small>پنج سؤال کوتاه دربارهٔ قد، تن‌خور، رنگ و بودجه — و بعد فقط چیزهایی که اندازه و رنگشان واقعاً موجود است.</small>
+            <span className="track-go">شروع کن <Icon d={art.chevron} size={15} /></span>
           </button>
           <button className="track" onClick={() => setTrack('help')}>
             <span className="track-art"><Icon d={art.life} size={26} /></span>
             <b>راهنما و مشکل فنی</b>
-            <small>کار با سایت، اندازه‌گیری، گالری، سبد خرید و چیزهایی که درست کار نمی‌کنند.</small>
-            <span className="track-go"><Icon d={art.chevron} size={16} /></span>
+            <small>سفارش دادن، انتخاب اندازه، کار با گالری و سبد خرید، و چیزهایی که درست کار نمی‌کنند.</small>
+            <span className="track-go">موضوع‌ها <Icon d={art.chevron} size={15} /></span>
           </button>
         </div>
       )}

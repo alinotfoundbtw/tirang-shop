@@ -66,17 +66,13 @@ export const FLOW = [
     ],
     customer: 'مرسوله تحویل پست شد.',
   },
-  {
-    key: 'delivered',
-    title: 'تحویل شد',
-    short: 'تحویل شده',
-    tone: 'paid',
-    by: 'shop',
-    icon: 'home',
-    needs: [{ name: 'receiver', label: 'تحویل‌گیرنده', hint: 'اسم کسی که بسته را گرفته', required: true }],
-    customer: 'بسته تحویل داده شد.',
-  },
 ];
+
+/* «تحویل شد» used to sit here and has been removed. The shop hands the parcel
+   to the courier and stops knowing; anything after that is the carrier's to
+   report, and a shop-side "delivered" button only records a guess. ارسال شد is
+   the end of what this shop can honestly claim — the کد رهگیری is how the
+   customer finds out the rest. */
 
 export const STEP = Object.fromEntries(FLOW.map((s) => [s.key, s]));
 export const stepIndex = (key) => FLOW.findIndex((s) => s.key === key);
@@ -192,23 +188,51 @@ export function advanceOrder(id, info = {}) {
     history: [...order.history, { at, status: step.key, by: 'shop', info }],
   };
   if (step.key === 'sent') updated.shipment = { carrier: info.carrier, tracking: info.tracking.trim(), at };
-  if (step.key === 'delivered') updated.deliveredTo = info.receiver.trim();
 
   write(list.map((o) => (o.id === id ? updated : o)));
   return { ok: true, order: updated };
 }
 
-export function cancelOrder(id, reason = '') {
+export const CANCEL_REASONS = [
+  'مشتری منصرف شد',
+  'کالا موجود نیست',
+  'آدرس یا شماره اشتباه بود',
+  'مرسوله به ما برگشت',
+  'سفارش تکراری',
+  'دلیل دیگر',
+];
+
+/**
+ * Cancels an order and records the refund alongside it.
+ *
+ * Every order here has already been paid — that is the only way one gets
+ * created — so cancelling one always owes the customer money back. Keeping the
+ * reason and the refund reference on the order is the difference between "we
+ * cancelled it" and being able to answer, three weeks later, why and where the
+ * money went. Cancelling a shipped order is allowed: parcels do come back, and
+ * refusing to record that does not stop it happening.
+ */
+export function cancelOrder(id, { reason = '', detail = '', refundRef = '' } = {}) {
   const list = read();
   const order = list.find((o) => o.id === id);
   if (!order) return { ok: false, error: 'سفارش پیدا نشد.' };
-  if (order.status === 'sent' || order.status === 'delivered') {
-    return { ok: false, error: 'سفارشی که ارسال شده را نمی‌شود لغو کرد.' };
-  }
+  if (!reason.trim()) return { ok: false, error: 'دلیل لغو را انتخاب کنید.' };
+  if (order.status === 'canceled') return { ok: false, error: 'این سفارش قبلاً لغو شده.' };
+  const at = nowISO();
   const updated = {
     ...order,
     status: 'canceled',
-    history: [...order.history, { at: nowISO(), status: 'canceled', by: 'shop', info: { reason } }],
+    refund: {
+      reason: reason.trim(),
+      detail: detail.trim(),
+      // Refunds to a card take days to land. Without a reference it is
+      // 'pending', which is a state the customer can be told about honestly.
+      ref: refundRef.trim(),
+      status: refundRef.trim() ? 'done' : 'pending',
+      amount: order.total,
+      at,
+    },
+    history: [...order.history, { at, status: 'canceled', by: 'shop', info: { reason, detail, refundRef } }],
   };
   write(list.map((o) => (o.id === id ? updated : o)));
   return { ok: true, order: updated };

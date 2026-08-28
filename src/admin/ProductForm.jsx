@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { categories, SIZES } from '../data/products';
-import { addProduct } from '../lib/catalog';
+import { addProduct, updateProduct } from '../lib/catalog';
 import { shrinkImage, storageUsed, asMB } from '../lib/images';
 import { useShop } from '../lib/store';
 import { fa } from '../lib/format';
@@ -43,9 +43,25 @@ const BLANK = {
   colors: [blankColor()],
 };
 
-export default function ProductForm({ onDone, onCancel }) {
+/** An existing product, poured back into the form's shape. */
+function fromProduct(p) {
+  return {
+    name: p.name, subtitle: p.subtitle, category: p.category,
+    price: String(Math.round(p.price / 1000)),
+    oldPrice: p.oldPrice ? String(Math.round(p.oldPrice / 1000)) : '',
+    fit: p.fit, gsm: String(p.gsm), fabric: p.fabric, model: p.model, care: p.care,
+    bio: p.bio, tags: p.tags.join('، '), days: String(p.days ?? 5),
+    banner: p.banner ?? null,
+    colors: p.colors.map((c) => ({
+      name: c.name, hex: c.hex, photos: [...c.photos],
+      stock: Object.fromEntries(SIZES.map((s) => [s, c.stock?.[s] ?? 0])),
+    })),
+  };
+}
+
+export default function ProductForm({ editing, onDone, onCancel }) {
   const { toast } = useShop();
-  const [f, setF] = useState(BLANK);
+  const [f, setF] = useState(() => (editing ? fromProduct(editing) : BLANK));
   const [busy, setBusy] = useState('');
   const [error, setError] = useState('');
 
@@ -96,8 +112,10 @@ export default function ProductForm({ onDone, onCancel }) {
     const stamp = Date.now();
     const slugBase = f.name.trim().replace(/\s+/g, '-').replace(/[^\p{L}\p{N}-]/gu, '');
     const product = {
-      id: `c${stamp}`,
-      slug: `${slugBase}-${String(stamp).slice(-4)}`,
+      // An edit keeps its id and its URL: changing the slug would break every
+      // link and every order line that already points at this product.
+      id: editing ? editing.id : `c${stamp}`,
+      slug: editing ? editing.slug : `${slugBase}-${String(stamp).slice(-4)}`,
       name: f.name.trim(),
       subtitle: f.subtitle.trim() || `${f.fit} · ${f.gsm} گرم`,
       category: f.category,
@@ -108,10 +126,10 @@ export default function ProductForm({ onDone, onCancel }) {
       fabric: f.fabric.trim(),
       model: f.model.trim(),
       care: f.care.trim(),
-      rating: 5,
-      sales: 0,
+      rating: editing?.rating ?? 5,
+      sales: editing?.sales ?? 0,
       days: Number(f.days) || 5,
-      new: true,
+      new: editing ? editing.new : true,
       sizes: SIZES,
       colors: colors.map((c) => ({
         name: c.name.trim(),
@@ -127,9 +145,9 @@ export default function ProductForm({ onDone, onCancel }) {
       tags: f.tags.split(/[,،]/).map((t) => t.trim()).filter(Boolean),
     };
 
-    const res = addProduct(product);
+    const res = editing ? updateProduct(editing.id, product) : addProduct(product);
     if (!res.ok) return setError(res.error);
-    toast(`«${product.name}» اضافه شد و در جست‌وجو پیدا می‌شود`);
+    toast(editing ? `«${product.name}» به‌روز شد` : `«${product.name}» اضافه شد و در جست‌وجو پیدا می‌شود`);
     onDone?.(product);
   };
 
@@ -320,7 +338,9 @@ export default function ProductForm({ onDone, onCancel }) {
       {error && <p className="auth-error" role="alert">{error}</p>}
 
       <div className="row" style={{ gap: 'var(--s3)', flexWrap: 'wrap' }}>
-        <button className="btn btn-primary grow" type="submit" disabled={Boolean(busy)}>ثبت محصول</button>
+        <button className="btn btn-primary grow" type="submit" disabled={Boolean(busy)}>
+          {editing ? 'ذخیرهٔ تغییرات' : 'ثبت محصول'}
+        </button>
         <button className="btn btn-ghost" type="button" onClick={onCancel}>انصراف</button>
       </div>
 

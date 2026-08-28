@@ -2032,6 +2032,88 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .track2 p { min-height: 2.6em; }
 }
 
+/* ── The two tracks on the assistant page ──────────────────
+   They were a three-column grid — icon, text, chevron — which squeezed the
+   description into a gutter between two fixed columns and made a wide card
+   read as a narrow one. The icon sits above the text now and the card gets
+   its full width back.
+   ───────────────────────────────────────────────────────── */
+.track {
+  display: grid;
+  grid-template-columns: none;
+  grid-template-areas: none;
+  gap: var(--s3);
+  align-items: start;
+  padding: var(--s5) var(--s4) var(--s4);
+  min-block-size: 100%;
+}
+.track-art {
+  grid-area: auto;
+  inline-size: 54px; block-size: 54px;
+  border-radius: var(--r-md);
+}
+.track b {
+  grid-area: auto;
+  font-size: 1.25rem; line-height: 1.3;
+}
+.track small {
+  grid-area: auto;
+  font-size: var(--t-sm); line-height: 1.75; color: var(--ink-45);
+  max-inline-size: 40ch;
+}
+.track-go {
+  grid-area: auto;
+  display: inline-flex; align-items: center; gap: 6px;
+  margin-block-start: var(--s2);
+  font-size: var(--t-sm); font-weight: 600; color: var(--wine);
+}
+.track:hover .track-go { gap: 10px; }
+.track-go { transition: gap 0.2s var(--ease); }
+
+/* ── A button for the thing you might regret ───────────── */
+.btn-danger {
+  background: var(--danger); color: #fff;
+  box-shadow: var(--shadow-1);
+}
+.btn-danger:hover { background: color-mix(in srgb, var(--danger) 84%, var(--ink)); }
+
+.cancel-open { margin-block-start: var(--s4); }
+.cancelbox {
+  display: grid; gap: var(--s3);
+  padding: var(--s4); margin-block-start: var(--s4);
+  border-radius: var(--r-md);
+  border: 1px solid color-mix(in srgb, var(--danger) 40%, var(--line));
+  background: var(--cherry-soft);
+}
+.cancelbox > b { font-size: var(--t-sm); color: var(--danger); }
+.cancelbox > p { font-size: var(--t-xs); color: var(--ink-70); line-height: 1.8; }
+
+.refund-note {
+  padding: var(--s4); margin-block-start: var(--s4);
+  border-radius: var(--r-md); background: var(--blush);
+  font-size: var(--t-sm);
+}
+.refund-note b { color: var(--danger); }
+.refund-note p { font-size: var(--t-xs); color: var(--ink-70); margin-block-start: 4px; }
+
+/* ── Catalog rows ──────────────────────────────────────── */
+.prod-rows li { grid-template-columns: 44px 1fr auto auto; }
+.prod-actions { display: flex; gap: var(--s2); align-items: center; flex: none; }
+.prod-actions .btn-quiet { font-size: var(--t-xs); min-height: 36px; padding-inline: var(--s2); }
+
+@media (max-width: 560px) {
+  /* The row runs out of width before the actions do; give them their own line. */
+  .prod-rows li {
+    grid-template-columns: 44px 1fr auto;
+    grid-template-areas: 'img name price' 'img actions actions';
+    row-gap: var(--s2);
+  }
+  .prod-rows img, .prod-blank { grid-area: img; }
+  .prod-name { grid-area: name; }
+  .prod-price { grid-area: price; }
+  .prod-actions { grid-area: actions; }
+}
+
 /* ── Responsive ────────────────────────────────────────── */
 @media (min-width: 700px) {
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }

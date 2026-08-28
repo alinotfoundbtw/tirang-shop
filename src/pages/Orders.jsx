@@ -99,6 +99,23 @@ export function OrderDetail() {
 
       <Track order={order} />
 
+      {order.refund && (
+        <div className="panel">
+          <h3>لغو و بازگشت وجه</h3>
+          <dl className="spec">
+            <dt>دلیل</dt><dd>{order.refund.reason}</dd>
+            {order.refund.detail && <><dt>توضیح</dt><dd>{order.refund.detail}</dd></>}
+            <dt>مبلغ</dt><dd className="num">{toman(order.refund.amount)}</dd>
+            <dt>وضعیت</dt>
+            <dd>
+              {order.refund.status === 'done'
+                ? <>بازگردانده شد — کد <Copy value={order.refund.ref} /></>
+                : 'در حال بازگشت به حساب شما. معمولاً تا ۷۲ ساعت کاری طول می‌کشد.'}
+            </dd>
+          </dl>
+        </div>
+      )}
+
       <div className="panel">
         <h3>کدها</h3>
         <dl className="spec">

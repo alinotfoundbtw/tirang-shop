@@ -13,6 +13,10 @@
 import { products as seed } from '../data/products.js';
 
 const KEY = 'tirang.catalog.v1';
+/* Seed products live in a source file and cannot be rewritten, so an edit to
+   one is stored as a patch laid over it at read time. Deleting this key puts
+   the shipped catalog back exactly as it was. */
+const EDITS = 'tirang.catalog.edits.v1';
 
 /* Node has no localStorage, and rag-eval.mjs imports this chain to check
    retrieval without a browser. There, the catalog is simply the seed. */
@@ -49,10 +53,44 @@ function writeCustom(list) {
   }
 }
 
+function readEdits() {
+  if (!hasStore) return {};
+  try {
+    const saved = JSON.parse(localStorage.getItem(EDITS));
+    return saved && typeof saved === 'object' ? saved : {};
+  } catch {
+    return {};
+  }
+}
+
+function writeEdits(map) {
+  if (!hasStore) return { ok: true };
+  try {
+    localStorage.setItem(EDITS, JSON.stringify(map));
+    return { ok: true };
+  } catch {
+    return { ok: false, error: 'حافظهٔ مرورگر پر شد.' };
+  }
+}
+
 function rebuild() {
-  cache = [...readCustom(), ...seed];
+  const edits = readEdits();
+  const apply = (p) => (edits[p.id] ? { ...p, ...edits[p.id] } : p);
+  cache = [...readCustom().map(apply), ...seed.map(apply)];
   listeners.forEach((fn) => fn());
   return cache;
+}
+
+/** True when this product carries owner edits on top of what shipped. */
+export const isEdited = (id) => Boolean(readEdits()[id]);
+
+/** Puts a seed product back to how it shipped. */
+export function resetProduct(id) {
+  const edits = readEdits();
+  delete edits[id];
+  const res = writeEdits(edits);
+  if (res.ok) rebuild();
+  return res;
 }
 
 /** Every product the shop currently sells, newest additions first. */
@@ -76,8 +114,23 @@ export function addProduct(product) {
   return res;
 }
 
+/**
+ * Edits a product.
+ *
+ * One the owner created is rewritten in place. One that shipped with the
+ * template is patched over instead, because its real definition is a source
+ * file this cannot reach — and an edit that silently vanished on the next
+ * deploy would be worse than one that is recorded as an override.
+ */
 export function updateProduct(id, patch) {
-  const res = writeCustom(readCustom().map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  const own = readCustom();
+  if (own.some((p) => p.id === id)) {
+    const res = writeCustom(own.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+    if (res.ok) rebuild();
+    return res;
+  }
+  const edits = readEdits();
+  const res = writeEdits({ ...edits, [id]: { ...edits[id], ...patch } });
   if (res.ok) rebuild();
   return res;
 }
