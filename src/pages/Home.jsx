@@ -1,12 +1,10 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { categories, products } from '../data/products';
+import Hero from '../components/Hero';
 import ProductCard from '../components/ProductCard';
 import QuickView from '../components/QuickView';
-import { Photo, preload } from '../components/States';
 import { useSeo } from '../lib/seo';
-import { armMorph } from '../lib/morph';
-import { fa } from '../lib/format';
 
 export default function Home() {
   useSeo({
@@ -15,86 +13,14 @@ export default function Home() {
     path: '/',
   });
 
-  const hero = products.find((p) => p.slug === 'oversize-basic');
-  const [hc, setHc] = useState(0);
   const [quick, setQuick] = useState(null);
-  const heroRef = useRef(null);
 
   const fresh = products.filter((p) => p.new).slice(0, 6);
   const best = [...products].sort((a, b) => b.sales - a.sales).slice(0, 4);
-  const colorCount = new Set(products.flatMap((p) => p.colors.map((c) => c.name))).size;
 
   return (
     <>
-      <section className="hero">
-        <div className="wrap hero-grid">
-          <div>
-            <p className="eyebrow">دوخت تهران · نخ پنبهٔ ایرانی</p>
-            <h1>
-              رنگ را
-              <br />
-              <em>خودت</em> انتخاب کن.
-            </h1>
-            <p>
-              هر رنگ عکس خودش را دارد، نه فیلتر رنگی روی یک عکس. آنچه می‌بینی همان است که به دستت
-              می‌رسد.
-            </p>
-
-            {hero && (
-              <div className="hero-swatches">
-                {hero.colors.map((c, i) => (
-                  <button
-                    key={c.name}
-                    className="sw sw-lg"
-                    style={{ background: c.hex }}
-                    aria-pressed={i === hc}
-                    aria-label={`نمایش رنگ ${c.name}`}
-                    onMouseEnter={() => { setHc(i); preload(c.photos[0]); }}
-                    onTouchStart={() => preload(c.photos[0])}
-                    onClick={() => setHc(i)}
-                  />
-                ))}
-                <span className="muted" style={{ fontSize: 'var(--t-sm)' }}>{hero.colors[hc].name}</span>
-              </div>
-            )}
-
-            <div className="hero-actions">
-              <Link to="/products" className="btn btn-primary">دیدن همهٔ تیشرت‌ها</Link>
-              <Link to="/ask" className="btn btn-ghost">نمی‌دانم کدام را بخرم</Link>
-            </div>
-
-            <div className="hero-stats">
-              <span><b className="num">{fa(products.length)}</b> مدل</span>
-              <span><b className="num">{fa(colorCount)}</b> رنگ</span>
-              <span><b>۷ روز</b> تعویض سایز رایگان</span>
-            </div>
-          </div>
-
-          {hero && (
-            <Link
-              to={`/p/${hero.slug}`}
-              className="hero-art"
-              data-morph
-              ref={heroRef}
-              viewTransition
-              onClick={() => armMorph(heroRef.current)}
-              aria-label={hero.name}
-            >
-              <Photo
-                src={hero.colors[hc].photos[0]}
-                alt={`${hero.name} — رنگ ${hero.colors[hc].name}`}
-                eager
-                tone={hero.colors[hc].hex}
-                sizes="(max-width: 699px) 100vw, 520px"
-              />
-              <span className="hero-tag" aria-hidden="true">
-                {hero.name}
-                <small>{hero.colors[hc].name}</small>
-              </span>
-            </Link>
-          )}
-        </div>
-      </section>
+      <Hero />
 
       <section className="section wrap">
         <div className="section-head"><h2>دسته‌ها</h2></div>

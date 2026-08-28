@@ -1,6 +1,7 @@
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useShop } from '../lib/store';
+import Footer from './Footer';
 import { fa } from '../lib/format';
 
 const Icon = ({ d, size = 22 }) => (
@@ -100,46 +101,7 @@ export default function Layout() {
         <Outlet />
       </main>
 
-      <footer className="footer has-tabbar">
-        <div className="wrap">
-          <div className="footer-cols">
-            <div>
-              <Link to="/" className="logo">تیرنگ</Link>
-              <p className="muted" style={{ fontSize: 'var(--t-sm)', maxWidth: '32ch', marginTop: 8 }}>
-                تیشرت پایه و طرح‌دار با نخ پنبهٔ ایرانی. رنگ‌ها همان‌اند که در عکس می‌بینید.
-              </p>
-            </div>
-            <div>
-              <h3>فروشگاه</h3>
-              <nav aria-label="فروشگاه">
-                <Link to="/products">همهٔ تیشرت‌ها</Link>
-                <Link to="/products?cat=pack">پک اقتصادی</Link>
-                <Link to="/products?cat=kids">بچگانه</Link>
-                <Link to="/wishlist">علاقه‌مندی‌ها</Link>
-              </nav>
-            </div>
-            <div>
-              <h3>راهنما</h3>
-              <nav aria-label="راهنما">
-                <Link to="/faq">جدول اندازه</Link>
-                <Link to="/faq">تعویض و مرجوعی</Link>
-                <Link to="/ask">مشاور خرید</Link>
-              </nav>
-            </div>
-            <div>
-              <h3>ارتباط</h3>
-              <nav aria-label="ارتباط">
-                <a href="https://instagram.com" rel="noopener noreferrer nofollow" target="_blank">اینستاگرام</a>
-                <a href="tel:+982100000000">۰۲۱-۰۰۰۰۰۰۰۰</a>
-              </nav>
-            </div>
-          </div>
-          <div className="footer-base">
-            <span>© ۱۴۰۵ تیرنگ — همهٔ حقوق محفوظ است.</span>
-            <span>تصاویر نمونه از Pexels</span>
-          </div>
-        </div>
-      </footer>
+      <Footer />
 
       <nav className="tabbar" aria-label="پیمایش موبایل">
         {tabs.map((t) => (

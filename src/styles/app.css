@@ -196,9 +196,7 @@ textarea.field { min-height: 96px; resize: vertical; }
 .tabbar a:active { background: var(--blush); }
 .tabbar a.active { color: var(--wine); }
 .tabbar a.active::before { content: ''; position: absolute; inset-block-start: 0; width: 26px; height: 2px; background: var(--cherry); border-radius: 0 0 3px 3px; }
-/* Clearance for the fixed tab bar. Only the last thing on the page pays it,
-   or the gap gets counted twice. */
-.has-tabbar { padding-block-end: var(--bottom-safe); }
+
 
 /* ── Photo primitive: blur-up, no layout shift ─────────── */
 .ph { position: relative; overflow: hidden; background: var(--blush); }
@@ -212,47 +210,100 @@ textarea.field { min-height: 96px; resize: vertical; }
   font-size: var(--t-xs); color: var(--ink-45); background: var(--blush);
 }
 
-/* ── Hero ──────────────────────────────────────────────────
-   Phone: the shirt leads. The photo runs full-bleed under the header,
-   capped so the headline still peeks above the fold, and the colour name
-   rides on a scrim at its foot. Desktop: back to two columns, copy first.
+/* ── Hero banner ───────────────────────────────────────────
+   One banner, two shapes. On a phone the photo is the banner: full-bleed,
+   tall, with the headline sitting on a scrim over it. From 700px the copy
+   steps out to its own column and the photo becomes a framed panel beside it.
+   Both shapes share one DOM — the lede is placed into the photo's grid cell
+   on small screens and into its own on large ones.
    ───────────────────────────────────────────────────────── */
 .hero { padding-block: 0 var(--s5); }
-.hero-grid { display: grid; gap: var(--s5); }
+.hero-grid {
+  display: grid;
+  grid-template-areas: 'art' 'foot';
+  gap: var(--s4);
+}
+
+/* ── The rotating photo ── */
+.hero-art {
+  grid-area: art;
+  position: relative; overflow: hidden; isolation: isolate;
+  aspect-ratio: 4 / 5;
+  background: var(--blush);
+  border-radius: var(--r-lg);
+}
+.hero-shot {
+  position: absolute; inset: 0;
+  width: 100%; height: 100%; object-fit: cover;
+  opacity: 0;
+  transition: opacity 0.7s var(--ease);
+}
+.hero-shot.on { opacity: 1; }
+.hero-scrim {
+  position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(9, 10, 13, 0.82) 0%,
+    rgba(9, 10, 13, 0.52) 26%,
+    rgba(9, 10, 13, 0.08) 58%,
+    transparent 78%
+  );
+}
+
+/* ── The words ── */
+.hero-lede {
+  grid-area: art; align-self: end; z-index: 2; position: relative;
+  padding: var(--s5) var(--s4) var(--s4); color: #fff;
+  /* The photo behind is a link covering the whole banner. Only the two real
+     controls here intercept a tap; the headline lets it through. */
+  pointer-events: none;
+}
+.hero-now, .hero-dots { pointer-events: auto; }
+.hero-lede .eyebrow { color: rgba(255, 255, 255, 0.72); }
 .hero h1 {
   font-size: var(--t-hero);
   /* Persian display faces carry tall ascenders — 0.98 clipped them. */
   line-height: 1.06;
   letter-spacing: -0.035em;
   text-wrap: balance;
+  margin-block-start: var(--s2);
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.4);
 }
-.hero h1 em { font-style: normal; color: var(--wine); }
-.hero p { color: var(--ink-70); max-width: 40ch; margin-block-start: var(--s4); text-wrap: pretty; }
-.hero-actions { display: flex; gap: var(--s3); margin-block-start: var(--s5); flex-wrap: wrap; }
-.hero-actions .btn { flex: 1 1 auto; }
+/* Cobalt on a dark photograph is unreadable; the pale token carries it. */
+.hero-lede h1 em { font-style: normal; color: var(--sand); }
 
-.hero-art {
-  position: relative; overflow: hidden;
-  border-radius: var(--r-lg);
-  aspect-ratio: 4 / 5;
-  box-shadow: var(--shadow-2);
-  background: var(--blush);
+/* Names the shot on screen, and is the tap target for it. */
+.hero-now {
+  display: flex; align-items: center; gap: var(--s2);
+  min-height: var(--tap);
+  margin-block-start: var(--s4);
+  font-size: var(--t-sm);
+  animation: now-in 0.5s var(--ease) both;
 }
-.hero-art .ph { position: absolute; inset: 0; }
-
-/* Scrim + colour label, so the photo reads as a banner and not a stray image. */
-.hero-tag {
-  position: absolute; inset-inline: 0; inset-block-end: 0; z-index: 2;
-  display: flex; align-items: flex-end; gap: var(--s2);
-  padding: var(--s6) var(--s4) var(--s4);
-  background: linear-gradient(to top, rgba(10, 11, 14, 0.62), rgba(10, 11, 14, 0.18) 55%, transparent);
-  color: #fff; font-size: var(--t-sm); font-weight: 600;
-  text-shadow: 0 1px 12px rgba(0, 0, 0, 0.45);
-  pointer-events: none;
+@keyframes now-in { from { opacity: 0; transform: translateY(6px); } }
+.hero-now-name { font-weight: 600; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hero-now-price {
+  flex: none; padding: 3px 10px; border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.16); backdrop-filter: blur(6px);
+  font-weight: 700; font-size: var(--t-xs);
 }
-.hero-tag small { font-weight: 400; opacity: 0.78; font-size: var(--t-xs); }
+.hero-now svg { flex: none; opacity: 0.75; }
 
-.hero-swatches { display: flex; margin-block-start: var(--s4); align-items: center; flex-wrap: wrap; }
+.hero-dots { display: flex; gap: var(--s2); margin-block-start: var(--s4); }
+.hero-dots button {
+  width: 26px; height: 3px; border-radius: var(--r-full);
+  background: rgba(255, 255, 255, 0.34);
+  position: relative;
+  transition: background 0.25s var(--ease), width 0.25s var(--ease);
+}
+/* The bar is 3px tall; the target around it is not. */
+.hero-dots button::before { content: ''; position: absolute; inset: -18px -4px; }
+.hero-dots button.on { background: #fff; width: 38px; }
+
+/* ── Below the fold of the banner, back on paper ── */
+.hero-foot { grid-area: foot; }
+.hero-blurb { color: var(--ink-70); max-width: 42ch; text-wrap: pretty; }
+.hero-actions { display: flex; gap: var(--s3); margin-block-start: var(--s4); flex-wrap: wrap; }
 .hero-stats {
   display: flex; gap: var(--s5); margin-block-start: var(--s5);
   font-size: var(--t-xs); color: var(--ink-45); flex-wrap: wrap;
@@ -260,14 +311,19 @@ textarea.field { min-height: 96px; resize: vertical; }
 .hero-stats b { display: block; font-family: var(--font-display); font-size: 1.15rem; color: var(--ink); }
 
 @media (max-width: 699px) {
-  .hero-grid { gap: var(--s4); }
   .hero-art {
-    order: -1;                       /* photo first on a phone */
+    /* Full width of the screen, not of the gutter. */
     margin-inline: calc((var(--gutter) + var(--sal)) * -1) calc((var(--gutter) + var(--sar)) * -1);
     border-radius: 0 0 var(--r-lg) var(--r-lg);
-    max-height: 46vh;
-    max-height: 46svh;               /* ignores the collapsing URL bar */
-    box-shadow: none;
+    /* No max-height. The lede sits in this same grid cell, so the row is as
+       tall as whichever is taller and the photo stretches to match. A cap here
+       would let a long headline outgrow the photo and spill its white text
+       onto the paper below. The ratio already bounds the height. */
+    aspect-ratio: 3 / 4;
+  }
+  .hero-lede {
+    margin-inline: calc((var(--gutter) + var(--sal)) * -1) calc((var(--gutter) + var(--sar)) * -1);
+    padding-inline: calc(var(--gutter) + var(--sal)) calc(var(--gutter) + var(--sar));
   }
   .hero-actions .btn { flex: 1 1 100%; }
   .hero-stats { gap: var(--s4); justify-content: space-between; }
@@ -363,7 +419,7 @@ textarea.field { min-height: 96px; resize: vertical; }
 
 /* Rows of swatches declare their own gap so the hit boxes can match it. */
 .card-swatches { --sw-gap: 8px; }
-.hero-swatches, .colorpick-row, .filter-colors { --sw-gap: var(--s3); gap: var(--s3); }
+.colorpick-row, .filter-colors { --sw-gap: var(--s3); gap: var(--s3); }
 .sw-out::after {
   content: ''; position: absolute; inset: -1px;
   background: linear-gradient(to top left, transparent 46%, var(--ink-45) 46% 54%, transparent 54%);
@@ -682,15 +738,90 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 .toast { max-width: 100%; text-align: center; }
 .toast { background: var(--ink); color: var(--paper); padding: var(--s3) var(--s5); border-radius: var(--r-full); font-size: var(--t-sm); box-shadow: var(--shadow-2); animation: rise 0.28s var(--ease) both; }
 
-/* ── Footer ────────────────────────────────────────────── */
-.footer { margin-block-start: var(--s6); border-block-start: 1px solid var(--line); background: var(--blush); padding-block: var(--s6) var(--s5); }
-.footer-cols { display: grid; gap: var(--s5); grid-template-columns: 1fr 1fr; font-size: var(--t-sm); }
+/* ── Footer ────────────────────────────────────────────────
+   Three bands: what the shop promises, where to go, who to call.
+   The promises come first because that is what someone is weighing when
+   they scroll this far.
+   ───────────────────────────────────────────────────────── */
+.footer {
+  margin-block-start: var(--s7);
+  border-block-start: 1px solid var(--line);
+  background: var(--blush);
+  /* Clears the fixed tab bar itself. A .has-tabbar utility here lost to this
+     shorthand on source order, which left the tab bar sitting over the last
+     row of the footer. --bottom-safe is 0 once the tab bar is gone. */
+  padding-block: 0 calc(var(--s5) + var(--bottom-safe));
+}
+
+.promises {
+  list-style: none; padding: 0;
+  display: grid; gap: var(--s3);
+  padding-block: var(--s5);
+  border-block-end: 1px solid var(--line-strong);
+}
+.promises li {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: 'art title' 'art note';
+  gap: 0 var(--s3);
+  align-items: center;
+}
+.promise-art {
+  grid-area: art;
+  width: 42px; height: 42px; border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: var(--surface); color: var(--wine);
+  border: 1px solid var(--line);
+}
+.promises b { grid-area: title; font-size: var(--t-sm); }
+.promises small { grid-area: note; font-size: var(--t-xs); color: var(--ink-45); }
+
+.footer-cols {
+  display: grid; gap: var(--s5); grid-template-columns: 1fr 1fr;
+  font-size: var(--t-sm);
+  padding-block: var(--s6) 0;
+}
+.footer-brand { grid-column: 1 / -1; }
+.footer-brand p { color: var(--ink-70); max-width: 34ch; margin-block-start: var(--s2); }
 .footer h3 { font-size: var(--t-sm); margin-block-end: var(--s2); }
-/* Footer links are a dense list — on a phone they need real vertical room
-   between them or every tap is a coin toss. */
 .footer nav a { color: var(--ink-70); display: block; padding-block: 10px; }
 .footer nav a:hover { color: var(--wine); }
-.footer-base { margin-block-start: var(--s5); padding-block-start: var(--s4); border-block-start: 1px solid var(--line-strong); font-size: var(--t-xs); color: var(--ink-45); display: flex; justify-content: space-between; gap: var(--s3); flex-wrap: wrap; }
+.footer-hours { color: var(--ink-45); font-size: var(--t-xs); margin-block-start: var(--s2); }
+
+.footer-social { display: flex; gap: var(--s2); margin-block-start: var(--s4); }
+.footer-social a {
+  width: var(--tap); height: var(--tap); border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: var(--surface); border: 1px solid var(--line);
+  color: var(--ink-70);
+  transition: color 0.18s, border-color 0.18s, transform 0.18s var(--ease);
+}
+.footer-social a:hover { color: var(--wine); border-color: var(--wine); }
+.footer-social a:active { transform: scale(0.9); }
+
+.footer-base {
+  margin-block-start: var(--s6);
+  padding-block-start: var(--s4);
+  border-block-start: 1px solid var(--line-strong);
+  font-size: var(--t-xs); color: var(--ink-45);
+  display: flex; justify-content: space-between; align-items: center;
+  gap: var(--s3); flex-wrap: wrap;
+}
+.to-top {
+  display: inline-flex; align-items: center; gap: 6px;
+  min-height: var(--tap); padding-inline: var(--s3);
+  color: var(--ink-70); font-size: var(--t-xs);
+  margin-inline-start: auto;
+}
+.to-top:hover { color: var(--wine); }
+
+@media (min-width: 560px) {
+  .promises { grid-template-columns: repeat(3, 1fr); gap: var(--s4); }
+}
+@media (min-width: 700px) {
+  .footer-cols { grid-template-columns: 2fr 1fr 1fr 1fr; }
+  .footer-brand { grid-column: auto; }
+}
 
 /* ── Admin ─────────────────────────────────────────────── */
 .admin { min-height: 100dvh; display: grid; grid-template-columns: 1fr; background: var(--paper); }
@@ -758,13 +889,6 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 
 /* ── Landscape phone ───────────────────────────────────────
    Short and wide: a hero sized for a portrait screen would fill the whole of it. */
-@media (max-width: 899px) and (orientation: landscape) and (max-height: 500px) {
-  .hero-art { max-height: 78svh; }
-  .hero-grid { grid-template-columns: 1fr 1fr; align-items: center; gap: var(--s4); }
-  .hero-art { order: 0; margin-inline: 0; border-radius: var(--r-md); }
-  .bot { min-height: 0; }
-}
-
 /* ── Responsive ────────────────────────────────────────── */
 @media (min-width: 700px) {
   .grid-products { grid-template-columns: repeat(3, 1fr); gap: var(--s5); }
@@ -774,7 +898,31 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .footer-cols { grid-template-columns: 2fr 1fr 1fr 1fr; }
   .kpis { grid-template-columns: repeat(4, 1fr); }
   .hero { padding-block: var(--s6) var(--s5); }
-  .hero-grid { grid-template-columns: 1.1fr 1fr; align-items: center; gap: var(--s7); }
+  /* The lede leaves the photo and takes its own column; the photo becomes a
+     framed panel rather than the whole banner. */
+  .hero-grid {
+    grid-template-columns: 1.05fr 1fr;
+    grid-template-areas: 'lede art' 'foot art';
+    align-items: center;
+    column-gap: var(--s7); row-gap: var(--s4);
+  }
+  .hero-art {
+    grid-area: art; aspect-ratio: 4 / 5; max-height: none;
+    border-radius: var(--r-lg); box-shadow: var(--shadow-2);
+  }
+  .hero-lede {
+    grid-area: lede; align-self: end;
+    margin-inline: 0; padding: 0; color: inherit;
+  }
+  .hero-lede .eyebrow { color: var(--ink-45); }
+  .hero-lede h1 { text-shadow: none; }
+  .hero-lede h1 em { color: var(--wine); }
+  .hero-now-price { background: var(--sand); color: var(--wine); }
+  .hero-now svg { opacity: 0.5; }
+  .hero-dots button { background: var(--line-strong); }
+  .hero-dots button.on { background: var(--ink); }
+  /* The scrim exists to carry white text over the photo; there is none here. */
+  .hero-scrim { opacity: 0; }
   .hero-actions .btn { flex: 0 0 auto; }
   .section { padding-block: var(--s7); }
   .modal { border-radius: var(--r-lg); padding: 0 var(--s4) var(--s6); }
@@ -791,7 +939,6 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
   .field, .bot-form input { font-size: var(--t-body); }
   .nav-desktop { display: flex; }
   .tabbar { display: none; }
-  .has-tabbar { padding-block-end: 0; }
   .buy-sticky { display: none; }
   .toasts { inset-block-end: var(--s5); justify-items: end; }
   .grid-products { grid-template-columns: repeat(4, 1fr); }
@@ -823,6 +970,25 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
    touch counterparts of the desktop hover states.
    Scroll-driven animations are progress-based, not time-based, so the global
    reduced-motion rule below cannot switch them off — they are gated here. */
+@media (max-width: 899px) and (orientation: landscape) and (max-height: 500px) {
+  /* Short and wide: give the photo its own column so the headline is not
+     stacked on top of a letterbox. */
+  .hero-grid {
+    grid-template-columns: 1fr 1fr;
+    grid-template-areas: 'lede art' 'foot art';
+    align-items: center; column-gap: var(--s5);
+  }
+  .hero-art { grid-area: art; margin-inline: 0; border-radius: var(--r-md); aspect-ratio: 3 / 4; max-height: 78svh; }
+  .hero-lede { grid-area: lede; margin-inline: 0; padding: 0; color: inherit; }
+  .hero-lede .eyebrow { color: var(--ink-45); }
+  .hero-lede h1 { text-shadow: none; }
+  .hero-lede h1 em { color: var(--wine); }
+  .hero-now-price { background: var(--sand); color: var(--wine); }
+  .hero-dots button { background: var(--line-strong); }
+  .hero-dots button.on { background: var(--ink); }
+  .bot { min-height: 0; }
+}
+
 @supports (animation-timeline: view()) {
   @media (prefers-reduced-motion: no-preference) and (max-width: 899px) {
     /* Not .rail children: a rail scrolls horizontally, and view() measures the
@@ -842,7 +1008,7 @@ td { padding-block: var(--s3); border-block-end: 1px solid var(--line); }
 
     /* The banner drifts and swells slightly as it leaves — the parallax that
        tells you the photo sits behind the page rather than in it. */
-    .hero-art .ph img {
+    .hero-shot {
       animation: hero-drift linear both;
       animation-timeline: view();
       animation-range: exit 0% exit 100%;
