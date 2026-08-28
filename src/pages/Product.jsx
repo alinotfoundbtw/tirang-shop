@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { products, categories } from '../data/products';
+import { categories } from '../data/products';
+import { allProducts, findProduct } from '../lib/catalog';
 import Gallery from '../components/Gallery';
 import ProductCard from '../components/ProductCard';
 import Reviews, { useProductReviews } from '../components/Reviews';
@@ -20,7 +21,7 @@ const MEASURES = {
 
 export default function Product() {
   const { slug } = useParams();
-  const { loading, data: p } = useAsync(() => products.find((x) => x.slug === slug) ?? null, [slug], { delay: 260 });
+  const { loading, data: p } = useAsync(() => findProduct(slug), [slug], { delay: 260 });
 
   if (loading) return <Loader />;
   if (!p)
@@ -79,8 +80,8 @@ function Detail({ p }) {
 
   const discount = off(p.price, p.oldPrice);
   const liked = wish.includes(p.id);
-  const related = products.filter((x) => x.id !== p.id && (x.category === p.category || x.tags.some((t) => p.tags.includes(t)))).slice(0, 4);
-  const recent = seen.filter((id) => id !== p.id).map((id) => products.find((x) => x.id === id)).filter(Boolean).slice(0, 4);
+  const related = allProducts().filter((x) => x.id !== p.id && (x.category === p.category || x.tags.some((t) => p.tags.includes(t)))).slice(0, 4);
+  const recent = seen.filter((id) => id !== p.id).map((id) => allProducts().find((x) => x.id === id)).filter(Boolean).slice(0, 4);
   const sizeRows = p.sizeLabels ? [] : p.sizes.filter((s) => MEASURES[s]);
 
   const add = () => {

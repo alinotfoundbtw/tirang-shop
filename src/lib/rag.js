@@ -21,7 +21,8 @@
 /* Explicit .js extensions: Vite does not need them, plain Node does, and
    scripts/rag-eval.mjs runs this module directly to check retrieval without
    a browser. */
-import { products, categories, faqs } from '../data/products.js';
+import { categories, faqs } from '../data/products.js';
+import { allProducts, subscribe } from './catalog.js';
 import { suggestSize, sizeFromHeight } from './sizing.js';
 import { fa } from './format.js';
 
@@ -169,7 +170,11 @@ function buildIndex(docs) {
   return { items, avgLen, idf };
 }
 
-const INDEX = buildIndex(products);
+/* Rebuilt whenever the owner adds or removes a product. A product that the
+   panel has created but retrieval has never seen is one the shop cannot find,
+   which is the same as not having it. */
+let INDEX = buildIndex(allProducts());
+subscribe(() => { INDEX = buildIndex(allProducts()); COLOR_TOKENS.clear(); });
 
 /* The question line is what shoppers echo, so it counts triple against the
    answer body. Rare words carry the signal: «تعویض» appears in one entry and
@@ -196,7 +201,7 @@ const FAQ_INDEX = (() => {
 /** token → the colour name exactly as the catalog spells it. */
 const COLOR_VOCAB = (() => {
   const m = new Map();
-  for (const p of products) {
+  for (const p of allProducts()) {
     for (const c of p.colors) {
       for (const t of tokenize(c.name)) if (!m.has(t)) m.set(t, c.name);
     }
@@ -510,7 +515,7 @@ export function search(query, { limit = 4, slots } = {}) {
   // «چیزی که الان موجود باشه» carries no product words at all — only a
   // constraint. Browse by the constraint instead of returning nothing.
   if (!hits.length && HAS_CONSTRAINT(f)) {
-    hits = products
+    hits = allProducts()
       .filter(
         (p) =>
           (!f.inStock || p.stock > 0) &&

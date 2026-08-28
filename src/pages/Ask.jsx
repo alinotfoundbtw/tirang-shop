@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { allProducts } from '../lib/catalog';
 import { helpTopics } from '../data/help';
 import Orb from '../components/Orb';
 import { search } from '../lib/rag';
@@ -122,11 +122,13 @@ function toQuery(a) {
   return bits.join(' ');
 }
 
-const palette = (() => {
+/* Read at render, not at import: a colour that only exists on a product the
+   owner added today still has to appear in the picker. */
+const palette = () => {
   const seen = new Map();
-  products.forEach((p) => p.colors.forEach((c) => seen.set(c.name, c.hex)));
+  allProducts().forEach((p) => p.colors.forEach((c) => seen.set(c.name, c.hex)));
   return [...seen.entries()];
-})();
+};
 
 export default function Ask() {
   useSeo({
@@ -230,7 +232,7 @@ export default function Ask() {
 
               {current.swatches ? (
                 <div className="quiz-colors">
-                  {palette.map(([name, hex]) => (
+                  {palette().map(([name, hex]) => (
                     <button
                       key={name}
                       className={`quiz-color ${answers.color === name ? 'on' : ''}`}

@@ -1594,6 +1594,92 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
   .order-grid { grid-template-columns: repeat(3, 1fr); }
 }
 
+/* ── The product form ──────────────────────────────────────
+   Long on purpose: every field is one retrieval reads, and a product saved
+   with three of them cannot be found. Grouped so the length reads as
+   sections rather than as a wall.
+   ───────────────────────────────────────────────────────── */
+.pform { display: grid; gap: var(--s5); }
+.pform section { display: grid; gap: var(--s3); }
+.pform h4 {
+  font-size: var(--t-xs); color: var(--ink-45); letter-spacing: 0.06em;
+  padding-block-end: var(--s2); border-block-end: 1px solid var(--line);
+}
+.pform .two { display: grid; gap: var(--s3); }
+.pform-why {
+  font-size: var(--t-xs); color: var(--ink-70); line-height: 1.85;
+  padding: var(--s3); border-radius: var(--r-sm);
+  background: var(--wine-soft);
+}
+.pform-busy { font-size: var(--t-sm); color: var(--wine); }
+.pform-note {
+  font-size: var(--t-xs); color: var(--ink-45); line-height: 1.85;
+  padding-block-start: var(--s3); border-block-start: 1px solid var(--line);
+}
+
+/* Pickers and previews */
+.drop { display: grid; }
+.drop-zone {
+  display: grid; place-items: center; gap: 6px;
+  min-height: 104px; padding: var(--s4);
+  border: 1.5px dashed var(--line-strong); border-radius: var(--r-md);
+  color: var(--ink-45); font-size: var(--t-xs);
+  cursor: pointer; transition: border-color 0.18s var(--ease), color 0.18s;
+}
+.drop-zone:hover { border-color: var(--wine); color: var(--wine); }
+.drop-zone input { display: none; }
+.drop-zone.small { min-height: 84px; width: 64px; padding: var(--s2); }
+
+.shots { display: flex; flex-wrap: wrap; gap: var(--s2); }
+.shot { position: relative; width: 64px; }
+.shot img {
+  width: 64px; height: 84px; object-fit: cover;
+  border-radius: var(--r-sm); background: var(--blush);
+}
+.shot.banner, .shot.banner img { width: 100%; height: auto; max-height: 180px; object-fit: cover; }
+.shot button {
+  position: absolute; inset-block-start: 4px; inset-inline-end: 4px;
+  width: 22px; height: 22px; border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: var(--scrim); color: #fff;
+}
+
+.cform {
+  display: grid; gap: var(--s3);
+  padding: var(--s4); border-radius: var(--r-md);
+  border: 1px solid var(--line); background: var(--paper);
+}
+.hexrow { display: flex; gap: var(--s2); align-items: center; }
+.hexrow input[type='color'] {
+  width: 46px; height: 44px; padding: 0; flex: none;
+  border: 1px solid var(--line-strong); border-radius: var(--r-sm); background: none;
+}
+.stockrow { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s2); }
+.stockrow label { display: grid; gap: 4px; justify-items: center; }
+.stockrow small { font-size: var(--t-xs); color: var(--ink-45); }
+.stockrow .field { text-align: center; padding-inline: 4px; }
+
+/* ── The catalog list ──────────────────────────────────── */
+.prod-rows { list-style: none; padding: 0; display: grid; gap: var(--s2); }
+.prod-rows li {
+  display: grid; grid-template-columns: 44px 1fr auto auto;
+  gap: var(--s3); align-items: center;
+  padding: var(--s2); border-radius: var(--r-md);
+  border: 1px solid var(--line);
+}
+.prod-rows img, .prod-blank {
+  width: 44px; height: 56px; object-fit: cover;
+  border-radius: var(--r-sm); background: var(--blush);
+}
+.prod-name { min-width: 0; }
+.prod-name b { display: flex; align-items: center; gap: var(--s2); font-size: var(--t-sm); }
+.prod-name small { display: block; font-size: var(--t-xs); color: var(--ink-45); }
+.prod-price { font-size: var(--t-sm); }
+
+@media (min-width: 700px) {
+  .pform .two { grid-template-columns: 1fr 1fr; }
+}
+
 /* ── Admin ─────────────────────────────────────────────── */
 .admin { min-height: 100dvh; display: grid; grid-template-columns: 1fr; background: var(--paper); }
 .admin-side {

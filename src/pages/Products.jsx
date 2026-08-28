@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
-import { products, categories } from '../data/products';
+import { categories } from '../data/products';
+import { useCatalog } from '../lib/useCatalog';
 import { search } from '../lib/rag';
 import ProductCard from '../components/ProductCard';
 import QuickView from '../components/QuickView';
@@ -26,6 +27,7 @@ export default function Products() {
   const color = params.get('color') || '';
   const fit = params.get('fit') || '';
   const sort = params.get('sort') || 'best';
+  const products = useCatalog();
   const [draft, setDraft] = useState(q);
   const [quick, setQuick] = useState(null);
 

@@ -1,74 +1,47 @@
 import { useState } from 'react';
-import { products as seed, categories } from '../data/products';
-import { toman, fa } from '../lib/format';
+import { Link } from 'react-router-dom';
+import { categories } from '../data/products';
+import { removeProduct, isCustom } from '../lib/catalog';
+import { useCatalog } from '../lib/useCatalog';
 import { normalize } from '../lib/rag';
 import { useShop } from '../lib/store';
 import { EmptyState } from '../components/States';
+import ProductForm from './ProductForm';
+import { toman, fa } from '../lib/format';
 
-/* One definition of an empty form, because there used to be two and they
-   disagreed. The reset wrote { category: 'shal', stock: '1' } — a category
-   slug this shop does not have, and two fields the inputs are not bound to,
-   while dropping the `fit` and `gsm` they are. After saving one product the
-   category select fell blank and React switched those two inputs from
-   controlled to uncontrolled. */
-const BLANK = { name: '', price: '', category: 'basic', fit: 'رگولار', gsm: '190', bio: '' };
-
-/* Adding a product is three fields and a save. Everything else has a sane
-   default the owner can change later — a shop owner abandons a 20-field form. */
+/**
+ * The catalog, as the owner sees it.
+ *
+ * Products created here go into the same list the shop and the assistant read
+ * (lib/catalog.js), so a product added on this screen is findable in search
+ * before you have finished walking back to the storefront tab.
+ *
+ * Seed products cannot be deleted from here. They ship with the template and
+ * live in a source file; a delete button that silently did nothing would be
+ * worse than not offering one.
+ */
 export function Catalog() {
   const { toast } = useShop();
-  const [list, setList] = useState(seed);
+  const list = useCatalog();
   const [open, setOpen] = useState(false);
-  const [form, setForm] = useState(BLANK);
   const [q, setQ] = useState('');
-
-  const save = () => {
-    if (!form.name.trim() || !form.price) return toast('اسم و قیمت لازم است', 'warn');
-    const stock = { S: 5, M: 8, L: 8, XL: 4, XXL: 2 };
-    const p = {
-      id: `n${Date.now()}`,
-      slug: `new-${Date.now()}`,
-      name: form.name.trim(),
-      subtitle: `${form.fit} · ${form.gsm} گرم`,
-      category: form.category,
-      price: Number(form.price) * 1000,
-      fit: form.fit,
-      gsm: Number(form.gsm) || 190,
-      fabric: 'نخ پنبه',
-      model: 'قد مدل ۱۷۸ سانت، سایز M پوشیده',
-      care: 'شست‌وشو با آب سرد، پشت‌ورو',
-      rating: 5,
-      sales: 0,
-      days: 5,
-      new: true,
-      sizes: ['S', 'M', 'L', 'XL', 'XXL'],
-      colors: [
-        { name: 'مشکی', hex: '#141414', photos: [], stock },
-        { name: 'سفید', hex: '#f4f2ee', photos: [], stock: { ...stock } },
-      ],
-      stock: Object.values(stock).reduce((a, b) => a + b, 0) * 2,
-      tone: '#141414',
-      bio: form.bio.trim() || `${form.name.trim()} با نخ پنبه.`,
-      tags: ['جدید'],
-    };
-    setList([p, ...list]);
-    setForm(BLANK);
-    setOpen(false);
-    toast(`«${p.name}» اضافه شد`);
-  };
-
-  const setStock = (id, by) =>
-    setList((l) => l.map((p) => (p.id === id ? { ...p, stock: Math.max(0, p.stock + by) } : p)));
 
   const needle = normalize(q);
   const shown = needle
     ? list.filter((p) => normalize(`${p.name} ${p.subtitle} ${p.tags.join(' ')}`).includes(needle))
     : list;
 
+  const mine = list.filter((p) => isCustom(p.id)).length;
+
   return (
     <>
       <div className="row between" style={{ flexWrap: 'wrap', gap: 'var(--s3)' }}>
-        <h1 style={{ fontSize: 'var(--t-h1)' }}>محصولات</h1>
+        <div>
+          <h1 style={{ fontSize: 'var(--t-h1)' }}>محصولات</h1>
+          <p className="muted" style={{ fontSize: 'var(--t-sm)' }}>
+            {fa(list.length)} محصول{mine > 0 && <> · {fa(mine)} تای آن را خودتان اضافه کرده‌اید</>}
+          </p>
+        </div>
         <button className="btn btn-primary" onClick={() => setOpen((o) => !o)}>
           {open ? 'بستن' : 'محصول تازه'}
         </button>
@@ -77,43 +50,7 @@ export function Catalog() {
       {open && (
         <div className="panel">
           <h3>محصول تازه</h3>
-          <div style={{ display: 'grid', gap: 'var(--s3)' }}>
-            <div>
-              <label className="label" htmlFor="n">اسم محصول</label>
-              <input id="n" className="field" value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder="تیشرت اورسایز پایه" />
-            </div>
-            <div className="row" style={{ gap: 'var(--s3)', alignItems: 'flex-end' }}>
-              <div className="grow">
-                <label className="label" htmlFor="p">قیمت (هزار تومان)</label>
-                <input id="p" className="field" inputMode="numeric" value={form.price} onChange={(e) => setForm({ ...form, price: e.target.value })} placeholder="۴۵۰" />
-              </div>
-              <div className="grow">
-                <label className="label" htmlFor="g">وزن پارچه (گرم)</label>
-                <input id="g" className="field" inputMode="numeric" value={form.gsm} onChange={(e) => setForm({ ...form, gsm: e.target.value })} />
-              </div>
-            </div>
-            <div>
-              <label className="label" htmlFor="f">تن‌خور</label>
-              <select id="f" className="field" value={form.fit} onChange={(e) => setForm({ ...form, fit: e.target.value })}>
-                {['رگولار', 'اورسایز', 'اسلیم'].map((f) => (
-                  <option key={f} value={f}>{f}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label" htmlFor="c">دسته</label>
-              <select id="c" className="field" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })}>
-                {categories.map((c) => (
-                  <option key={c.slug} value={c.slug}>{c.name}</option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="label" htmlFor="b">توضیح — همین متن را دستیار فروشگاه می‌خواند</label>
-              <textarea id="b" className="field" rows="3" value={form.bio} onChange={(e) => setForm({ ...form, bio: e.target.value })} placeholder="تن‌خور، جنس پارچه، و اینکه چه چیزی‌اش با بقیه فرق دارد." />
-            </div>
-            <button className="btn btn-primary" onClick={save}>ثبت محصول</button>
-          </div>
+          <ProductForm onDone={() => setOpen(false)} onCancel={() => setOpen(false)} />
         </div>
       )}
 
@@ -130,30 +67,36 @@ export function Catalog() {
         {shown.length === 0 ? (
           <EmptyState title="محصولی با این اسم نیست" body="اسم دیگری را امتحان کنید." />
         ) : (
-          <div className="table-scroll">
-            <table>
-              <thead>
-                <tr><th>محصول</th><th>دسته</th><th>قیمت</th><th>موجودی</th><th>فروش</th></tr>
-              </thead>
-              <tbody>
-                {shown.map((p) => (
-                  <tr key={p.id}>
-                    <td>{p.name}</td>
-                    <td className="muted">{categories.find((c) => c.slug === p.category)?.name}</td>
-                    <td className="num">{toman(p.price, { unit: false })}</td>
-                    <td>
-                      <span className="qty">
-                        <button onClick={() => setStock(p.id, -1)} aria-label={`کم‌کردن موجودی ${p.name}`}>−</button>
-                        <span className="num">{fa(p.stock)}</span>
-                        <button onClick={() => setStock(p.id, 1)} aria-label={`زیادکردن موجودی ${p.name}`}>+</button>
-                      </span>
-                    </td>
-                    <td className="num muted">{fa(p.sales)}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ul className="prod-rows">
+            {shown.map((p) => {
+              const own = isCustom(p.id);
+              const photo = p.colors[0]?.photos[0];
+              return (
+                <li key={p.id}>
+                  {photo ? <img src={photo} alt="" loading="lazy" decoding="async" /> : <span className="prod-blank" />}
+                  <span className="prod-name">
+                    <b>
+                      <Link to={`/p/${p.slug}`}>{p.name}</Link>
+                      {own && <span className="badge badge-new">افزودهٔ شما</span>}
+                    </b>
+                    <small>
+                      {categories.find((c) => c.slug === p.category)?.name} · {p.fit} ·{' '}
+                      {fa(p.colors.length)} رنگ · موجودی {fa(p.stock)}
+                    </small>
+                  </span>
+                  <b className="num prod-price">{toman(p.price, { unit: false })}</b>
+                  {own && (
+                    <button
+                      className="btn-quiet danger"
+                      onClick={() => { removeProduct(p.id); toast(`«${p.name}» حذف شد`, 'warn'); }}
+                    >
+                      حذف
+                    </button>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
         )}
       </div>
     </>

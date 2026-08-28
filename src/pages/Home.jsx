@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
-import { categories, products } from '../data/products';
+import { categories } from '../data/products';
+import { useCatalog } from '../lib/useCatalog';
 import Hero from '../components/Hero';
 import CategoryMark from '../components/CategoryMark';
 import ProductCard from '../components/ProductCard';
@@ -41,7 +42,7 @@ function Rail({ title, note, to, items, onQuickView, eager = false }) {
 
 /** A few review lines, pulled from the same sample data the product pages
  *  show. Labelled there and labelled here. */
-function VoicesStrip() {
+function VoicesStrip({ products }) {
   const picks = reviews.filter((r) => r.rating === 5).slice(0, 6);
   return (
     <section className="section wrap">
@@ -79,6 +80,7 @@ export default function Home() {
     path: '/',
   });
 
+  const products = useCatalog();
   const [quick, setQuick] = useState(null);
 
   /* Rails carry the whole catalog rather than a handful. They are scroll-snap
@@ -186,7 +188,7 @@ export default function Home() {
         onQuickView={setQuick}
       />
 
-      <VoicesStrip />
+      <VoicesStrip products={products} />
 
       {quick && <QuickView product={quick} onClose={() => setQuick(null)} />}
     </>

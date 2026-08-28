@@ -1,5 +1,5 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useReducer, useState } from 'react';
-import { products } from '../data/products';
+import { allProducts } from './catalog';
 
 const CART = 'tirang.cart.v1';
 const THEME = 'tirang.theme.v1';
@@ -115,7 +115,7 @@ export function ShopProvider({ children }) {
   const markSeen = useCallback((id) => setSeen((s) => [id, ...s.filter((x) => x !== id)].slice(0, 8)), []);
 
   const detailed = useMemo(
-    () => lines.map((l) => ({ ...l, product: products.find((p) => p.id === l.id) })).filter((l) => l.product),
+    () => lines.map((l) => ({ ...l, product: allProducts().find((p) => p.id === l.id) })).filter((l) => l.product),
     [lines]
   );
 

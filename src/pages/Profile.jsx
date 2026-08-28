@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, Navigate } from 'react-router-dom';
-import { products } from '../data/products';
+import { allProducts } from '../lib/catalog';
 import { useAccount, validPhone } from '../lib/account';
 import { useShop } from '../lib/store';
 import { useSeo } from '../lib/seo';
@@ -104,7 +104,7 @@ function AccountTab({ acc }) {
         ) : (
           <ul className="my-reviews">
             {mine.map((r) => {
-              const p = products.find((x) => x.id === r.product);
+              const p = allProducts().find((x) => x.id === r.product);
               return (
                 <li key={r.id}>
                   <div className="row between">

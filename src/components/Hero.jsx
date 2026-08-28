@@ -1,6 +1,6 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { products } from '../data/products';
+import { useCatalog } from '../lib/useCatalog';
 import { armMorph } from '../lib/morph';
 import { toman, fa } from '../lib/format';
 
@@ -9,7 +9,7 @@ import { toman, fa } from '../lib/format';
 const ROTATE_MS = 8500;
 
 /** New arrivals lead; bestsellers fill the rest so the banner is never thin. */
-function pickSlides(limit = 5) {
+function pickSlides(products, limit = 5) {
   const fresh = products.filter((p) => p.new);
   const strong = [...products].sort((a, b) => b.sales - a.sales);
   const out = [];
@@ -27,7 +27,10 @@ const Arrow = () => (
 );
 
 export default function Hero() {
-  const slides = useRef(pickSlides()).current;
+  const products = useCatalog();
+  /* Recomputed when the catalog changes, but kept stable across the rotation
+     so the slide under the finger does not move. */
+  const slides = useMemo(() => pickSlides(products), [products]);
   const [i, setI] = useState(0);
   // Once someone picks a shot themselves, the banner stops deciding for them.
   const [taken, setTaken] = useState(false);

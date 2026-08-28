@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
-import { products, categories, revenueSeries, orders, botGaps, sizeCurve } from '../data/products';
+import { categories, revenueSeries, orders, botGaps, sizeCurve } from '../data/products';
+import { allProducts } from '../lib/catalog';
 import RevenueChart from './RevenueChart';
 import { toman, short, fa, percent } from '../lib/format';
 import { ADMIN_PATH } from '../lib/routes';
@@ -28,6 +29,7 @@ const Kpi = ({ label, value, delta, note }) => (
 );
 
 export default function Dashboard() {
+  const products = allProducts();
   const top = [...products].sort((a, b) => b.sales - a.sales).slice(0, 5);
   const max = top[0].sales;
   const low = products
