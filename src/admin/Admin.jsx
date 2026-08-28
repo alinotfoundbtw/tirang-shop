@@ -1,15 +1,16 @@
 import { NavLink, Outlet, Link } from 'react-router-dom';
 import { useSeo } from '../lib/seo';
+import { ADMIN_PATH } from '../lib/routes';
 
 const links = [
-  { to: '/admin', label: 'خلاصهٔ فروش', end: true },
-  { to: '/admin/catalog', label: 'محصولات' },
-  { to: '/admin/orders', label: 'سفارش‌ها' },
-  { to: '/admin/brand', label: 'ظاهر فروشگاه' },
+  { to: `/${ADMIN_PATH}`, label: 'خلاصهٔ فروش', end: true },
+  { to: `/${ADMIN_PATH}/catalog`, label: 'محصولات' },
+  { to: `/${ADMIN_PATH}/orders`, label: 'سفارش‌ها' },
+  { to: `/${ADMIN_PATH}/brand`, label: 'ظاهر فروشگاه' },
 ];
 
 export default function Admin() {
-  useSeo({ title: 'پنل فروشنده', noindex: true, path: '/admin' });
+  useSeo({ title: 'پنل فروشنده', noindex: true, path: `/${ADMIN_PATH}` });
 
   return (
     <div className="admin">

@@ -1,5 +1,8 @@
 import { useState } from 'react';
-import { reviewsFor, reviewSummary } from '../data/reviews';
+import { Link } from 'react-router-dom';
+import { reviewsFor } from '../data/reviews';
+import { useAccount } from '../lib/account';
+import { useShop } from '../lib/store';
 import { fa } from '../lib/format';
 
 /**
@@ -27,16 +30,29 @@ const Stars = ({ value, label }) => (
 
 const SHOW = 3;
 
+/** Sample entries plus whatever this browser has written, newest first, and
+ *  summarised together — a review you just left must move the average you are
+ *  looking at, or the page looks like it ignored you. */
+export function useProductReviews(productId) {
+  const { myReviews } = useAccount();
+  const mine = myReviews.filter((r) => r.product === productId);
+  const list = [...mine, ...reviewsFor(productId)];
+  if (!list.length) return { list, summary: null, mine: null };
+  const total = list.reduce((s, r) => s + r.rating, 0);
+  const stars = [5, 4, 3, 2, 1].map((n) => ({ n, count: list.filter((r) => r.rating === n).length }));
+  return { list, summary: { count: list.length, average: total / list.length, stars }, mine: mine[0] ?? null };
+}
+
 export default function Reviews({ product }) {
   const [all, setAll] = useState(false);
-  const list = reviewsFor(product.id);
-  const summary = reviewSummary(product.id);
+  const { list, summary, mine } = useProductReviews(product.id);
 
   if (!summary) {
     return (
       <section className="section reviews" id="reviews">
         <div className="section-head"><h2>نظر خریداران</h2></div>
         <p className="muted">هنوز نظری برای این مدل ثبت نشده است.</p>
+        <ReviewForm product={product} mine={null} />
       </section>
     );
   }
@@ -75,8 +91,9 @@ export default function Reviews({ product }) {
           <li key={r.id}>
             <div className="review-head">
               <span className="review-who">
-                <span className="review-avatar" aria-hidden="true">{r.name.trim()[0]}</span>
-                <b>{r.name}</b>
+                <span className="review-avatar" aria-hidden="true">{(r.name ?? 'من').trim()[0]}</span>
+                <b>{r.name ?? 'شما'}</b>
+                {r.mine && <span className="badge">نظر شما</span>}
               </span>
               <Stars value={r.rating} label={`${r.rating} از ۵`} />
             </div>
@@ -85,8 +102,9 @@ export default function Reviews({ product }) {
               {r.date}
               {r.size && <> · اندازهٔ {product.sizeLabels?.[r.size] ?? r.size}</>}
               {r.note && <> · {r.note}</>}
-              {' · '}
-              <span className="num">{fa(r.helpful)}</span> نفر مفید دانستند
+              {typeof r.helpful === 'number' && (
+                <> · <span className="num">{fa(r.helpful)}</span> نفر مفید دانستند</>
+              )}
             </p>
           </li>
         ))}
@@ -98,9 +116,100 @@ export default function Reviews({ product }) {
         </button>
       )}
 
+      <ReviewForm product={product} mine={mine} />
+
       <p className="review-note">
-        این نظرها نمونه‌اند و برای نمایش قالب نوشته شده‌اند، نه نظر خریدار واقعی.
+        نظرهای بالا نمونه‌اند و برای نمایش قالب نوشته شده‌اند، نه نظر خریدار واقعی. نظر خودت فقط
+        در همین مرورگر ذخیره می‌شود.
       </p>
     </section>
+  );
+}
+
+/** Writing a review. Signed-in only, one per product, editable and removable
+ *  — it is the writer's own text and it lives in their own browser. */
+function ReviewForm({ product, mine }) {
+  const { signedIn, addReview, removeReview } = useAccount();
+  const { toast } = useShop();
+  const [open, setOpen] = useState(false);
+  const [rating, setRating] = useState(mine?.rating ?? 5);
+  const [body, setBody] = useState(mine?.body ?? '');
+  const [error, setError] = useState('');
+
+  if (!signedIn) {
+    return (
+      <div className="review-cta">
+        <p>این تیشرت را خریده‌ای؟ نظرت به بقیه کمک می‌کند.</p>
+        <Link to="/enter" className="btn btn-ghost">برای ثبت نظر وارد شو</Link>
+      </div>
+    );
+  }
+
+  if (!open) {
+    return (
+      <div className="review-cta">
+        <p>{mine ? 'نظرت ثبت شده است.' : 'نظرت را دربارهٔ این تیشرت بنویس.'}</p>
+        <div className="row" style={{ gap: 'var(--s3)', flexWrap: 'wrap' }}>
+          <button
+            className="btn btn-ghost"
+            onClick={() => { setRating(mine?.rating ?? 5); setBody(mine?.body ?? ''); setOpen(true); }}
+          >
+            {mine ? 'ویرایش نظر' : 'ثبت نظر'}
+          </button>
+          {mine && (
+            <button className="btn-quiet" onClick={() => { removeReview(product.id); toast('نظرت حذف شد'); }}>
+              حذف نظر
+            </button>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  const submit = (e) => {
+    e.preventDefault();
+    if (body.trim().length < 10) return setError('کمی بیشتر بنویس — دست‌کم ده حرف.');
+    addReview({ product: product.id, rating, body });
+    toast('نظرت ثبت شد');
+    setOpen(false);
+    setError('');
+  };
+
+  return (
+    <form className="review-form" onSubmit={submit} noValidate>
+      <p className="label">امتیازت</p>
+      <div className="rate-row">
+        {[1, 2, 3, 4, 5].map((n) => (
+          <button
+            key={n}
+            type="button"
+            className={n <= rating ? 'on' : ''}
+            aria-label={`${fa(n)} ستاره`}
+            aria-pressed={n === rating}
+            onClick={() => setRating(n)}
+          >
+            <Star on={n <= rating} />
+          </button>
+        ))}
+      </div>
+
+      <label>
+        <span className="label">نظرت</span>
+        <textarea
+          className="field"
+          rows="4"
+          value={body}
+          onChange={(e) => { setBody(e.target.value); setError(''); }}
+          placeholder="تن‌خورش چطور بود؟ اندازه‌اش با جدول خواند؟ بعد از شست‌وشو چه شد؟"
+        />
+      </label>
+
+      {error && <p className="auth-error" role="alert">{error}</p>}
+
+      <div className="row" style={{ gap: 'var(--s3)' }}>
+        <button className="btn btn-primary grow" type="submit">ثبت</button>
+        <button className="btn btn-ghost" type="button" onClick={() => { setOpen(false); setError(''); }}>انصراف</button>
+      </div>
+    </form>
   );
 }

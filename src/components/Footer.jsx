@@ -32,6 +32,7 @@ const columns = [
       { to: '/products?cat=pack', label: 'پک اقتصادی' },
       { to: '/products?cat=kids', label: 'بچگانه' },
       { to: '/wishlist', label: 'علاقه‌مندی‌ها' },
+      { to: '/profile', label: 'حساب کاربری' },
     ],
   },
   {

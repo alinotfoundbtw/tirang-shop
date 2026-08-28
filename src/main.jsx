@@ -2,6 +2,7 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { ShopProvider } from './lib/store';
+import { AccountProvider } from './lib/account';
 import App from './App';
 import './styles/app.css';
 
@@ -9,7 +10,9 @@ createRoot(document.getElementById('root')).render(
   <StrictMode>
     <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       <ShopProvider>
-        <App />
+        <AccountProvider>
+          <App />
+        </AccountProvider>
       </ShopProvider>
     </BrowserRouter>
   </StrictMode>

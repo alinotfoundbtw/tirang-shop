@@ -3,8 +3,7 @@ import { Link, useParams } from 'react-router-dom';
 import { products, categories } from '../data/products';
 import Gallery from '../components/Gallery';
 import ProductCard from '../components/ProductCard';
-import Reviews from '../components/Reviews';
-import { reviewSummary } from '../data/reviews';
+import Reviews, { useProductReviews } from '../components/Reviews';
 import { ColorPicker, SizePicker, SizeFinder, useVariant } from '../components/Buy';
 import { Loader, EmptyState } from '../components/States';
 import { useShop, useAsync } from '../lib/store';
@@ -58,7 +57,7 @@ function Detail({ p }) {
   /* One rating on the page: the same summary feeds the line under the title,
      the section at the bottom and the structured data. Declared above useSeo
      because that call reads it while building the JSON-LD. */
-  const rating = reviewSummary(p.id);
+  const { summary: rating } = useProductReviews(p.id);
 
   useSeo({
     title: p.name,

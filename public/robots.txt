@@ -1,6 +1,8 @@
 User-agent: *
 Allow: /
-Disallow: /admin
+Disallow: /panel
 Disallow: /cart
+Disallow: /enter
+Disallow: /profile
 
 Sitemap: https://example.com/sitemap.xml

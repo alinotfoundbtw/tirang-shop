@@ -1,6 +1,7 @@
 import { NavLink, Link, Outlet, useLocation } from 'react-router-dom';
 import { useEffect, useLayoutEffect, useState } from 'react';
 import { useShop } from '../lib/store';
+import { useAccount } from '../lib/account';
 import Footer from './Footer';
 import QuickSearch from './QuickSearch';
 import { fa } from '../lib/format';
@@ -20,6 +21,7 @@ const icons = {
   search: <><circle cx="11" cy="11" r="6.5" /><path d="m16 16 4 4" /></>,
   sun: <><circle cx="12" cy="12" r="4" /><path d="M12 2.5v2M12 19.5v2M2.5 12h2M19.5 12h2M5 5l1.5 1.5M17.5 17.5 19 19M19 5l-1.5 1.5M6.5 17.5 5 19" /></>,
   moon: <path d="M20 14.2A8.2 8.2 0 0 1 9.8 4a8.5 8.5 0 1 0 10.2 10.2Z" />,
+  user: <><circle cx="12" cy="8.5" r="3.4" /><path d="M5 20a7 7 0 0 1 14 0" /></>,
 };
 
 const notes = [
@@ -38,6 +40,7 @@ const tabs = [
 
 export default function Layout() {
   const { count, toasts, wish, isDark, toggleTheme } = useShop();
+  const { signedIn } = useAccount();
   const { pathname } = useLocation();
 
   /* Layout effect, so the reset lands inside the same synchronous flush as the
@@ -81,7 +84,6 @@ export default function Layout() {
             <NavLink to="/products?cat=oversize">اورسایز</NavLink>
             <NavLink to="/products?cat=graphic">طرح‌دار</NavLink>
             <NavLink to="/ask">مشاور خرید</NavLink>
-            <NavLink to="/admin">پنل فروشنده</NavLink>
           </nav>
 
           <div className="header-actions">
@@ -97,6 +99,13 @@ export default function Layout() {
             <Link to="/wishlist" className="icon-btn" aria-label={`علاقه‌مندی‌ها، ${wish.length} کالا`}>
               <Icon d={icons.heart} />
               {wish.length > 0 && <span className="cart-count num">{fa(wish.length)}</span>}
+            </Link>
+            <Link
+              to={signedIn ? '/profile' : '/enter'}
+              className="icon-btn"
+              aria-label={signedIn ? 'پروفایل من' : 'ورود یا ثبت‌نام'}
+            >
+              <Icon d={icons.user} size={20} />
             </Link>
             <Link to="/cart" className="icon-btn" aria-label={`سبد خرید، ${count} کالا`}>
               <Icon d={icons.bag} />

@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { products, categories, revenueSeries, orders, botGaps, sizeCurve } from '../data/products';
 import RevenueChart from './RevenueChart';
 import { toman, short, fa, percent } from '../lib/format';
+import { ADMIN_PATH } from '../lib/routes';
 
 const last = revenueSeries.at(-1);
 const prev = revenueSeries.at(-2) ?? last;
@@ -175,7 +176,7 @@ export default function Dashboard() {
                   <tr key={g.q}>
                     <td>{g.q}</td>
                     <td className="num">{fa(g.count)}</td>
-                    <td><Link className="link-more" to="/admin/catalog">افزودن محصول</Link></td>
+                    <td><Link className="link-more" to={`/${ADMIN_PATH}/catalog`}>افزودن محصول</Link></td>
                   </tr>
                 ))}
               </tbody>

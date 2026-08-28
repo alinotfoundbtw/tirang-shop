@@ -6,7 +6,10 @@ import Products from './pages/Products';
 import Product from './pages/Product';
 import Cart from './pages/Cart';
 import Ask from './pages/Ask';
+import Auth from './pages/Auth';
+import Profile from './pages/Profile';
 import { Faq, Wishlist, NotFound } from './pages/Static';
+import { ADMIN_PATH } from './lib/routes';
 import { Loader, ErrorState } from './components/States';
 
 // The panel is only for the owner — visitors shouldn't download it.
@@ -48,9 +51,11 @@ export default function App() {
             <Route path="ask" element={<Ask />} />
             <Route path="faq" element={<Faq />} />
             <Route path="wishlist" element={<Wishlist />} />
+            <Route path="enter" element={<Auth />} />
+            <Route path="profile" element={<Profile />} />
             <Route path="*" element={<NotFound />} />
           </Route>
-          <Route path="admin" element={<Admin />}>
+          <Route path={ADMIN_PATH} element={<Admin />}>
             <Route index element={<Dashboard />} />
             <Route path="catalog" element={<Catalog />} />
             <Route path="orders" element={<Orders />} />

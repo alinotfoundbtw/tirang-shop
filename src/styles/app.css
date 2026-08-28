@@ -1139,6 +1139,180 @@ table.sizes td, table.sizes th { padding-inline-end: var(--s3); }
 .loader path { fill: none; stroke: var(--wine); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 260; stroke-dashoffset: 260; animation: trace 1.8s var(--ease) infinite; }
 @keyframes trace { 0% { stroke-dashoffset: 260; } 55% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -260; } }
 
+/* ── Sign in / sign up ─────────────────────────────────────
+   Two panes on a desktop, one column on a phone. No password field
+   anywhere — see pages/Auth.jsx for why.
+   ───────────────────────────────────────────────────────── */
+.auth { padding-block: var(--s6) var(--s8); }
+.auth-card {
+  display: grid; gap: 0;
+  max-width: 940px; margin-inline: auto;
+  border: 1px solid var(--line); border-radius: var(--r-lg);
+  overflow: hidden; background: var(--surface);
+  box-shadow: var(--shadow-1);
+}
+.auth-art {
+  display: grid; justify-items: center; gap: var(--s4);
+  padding: var(--s6) var(--s5);
+  text-align: center;
+  background:
+    radial-gradient(120% 100% at 50% 0%, var(--wine-soft), transparent 65%),
+    var(--blush);
+  border-block-end: 1px solid var(--line);
+}
+.auth-art h2 { font-family: var(--font-display); font-size: 1.5rem; }
+.auth-art p { color: var(--ink-70); font-size: var(--t-sm); max-width: 32ch; }
+
+.auth-form { padding: var(--s5) var(--s4) var(--s6); }
+.auth-tabs {
+  position: relative; display: grid; grid-template-columns: 1fr 1fr;
+  border-block-end: 1px solid var(--line); margin-block-end: var(--s5);
+}
+.auth-tabs button {
+  min-height: var(--tap); font-size: var(--t-sm); font-weight: 600;
+  color: var(--ink-45);
+}
+.auth-tabs button[aria-selected="true"] { color: var(--ink); }
+.auth-ink {
+  position: absolute; inset-block-end: -1px; height: 2px; width: 50%;
+  background: var(--wine); border-radius: 2px;
+  transition: transform 0.25s var(--ease);
+}
+.auth-ink.signin { transform: translateX(0); }
+/* RTL: the second tab sits to the left, so the marker travels that way. */
+.auth-ink.signup { transform: translateX(-100%); }
+
+.auth-field { display: block; margin-block-end: var(--s4); }
+.auth-input {
+  display: flex; align-items: center; gap: var(--s2);
+  padding-inline: var(--s3);
+  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  background: var(--paper); color: var(--ink-45);
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.auth-input:focus-within { border-color: var(--wine); box-shadow: 0 0 0 3px var(--wine-soft); }
+.auth-input input {
+  flex: 1; min-width: 0; border: 0; background: none; color: var(--ink);
+  font-size: 16px; min-height: var(--tap);
+}
+.auth-input input:focus { outline: none; }
+.auth-error {
+  color: var(--danger); font-size: var(--t-sm);
+  background: var(--cherry-soft); padding: var(--s2) var(--s3);
+  border-radius: var(--r-sm); margin-block-end: var(--s3);
+}
+.auth-swap { text-align: center; font-size: var(--t-sm); color: var(--ink-45); margin-block-start: var(--s4); }
+.auth-swap .link-more { background: none; }
+.auth-note, .profile-note {
+  display: grid; grid-template-columns: auto 1fr; gap: var(--s2);
+  margin-block-start: var(--s5); padding: var(--s3);
+  border-radius: var(--r-sm); background: var(--blush);
+  font-size: var(--t-xs); color: var(--ink-70); line-height: 1.85;
+}
+.auth-note svg, .profile-note svg { margin-block-start: 3px; color: var(--wine); }
+.auth-done { display: grid; justify-items: center; gap: var(--s4); text-align: center; padding-block: var(--s7); }
+.auth-done h1 { font-size: var(--t-h1); }
+
+/* ── Profile ─────────────────────────────────────────────── */
+.profile { padding-block: var(--s5) var(--s8); }
+.profile-head {
+  display: grid; grid-template-columns: auto 1fr auto; gap: var(--s3);
+  align-items: center; margin-block-end: var(--s5);
+}
+.profile-avatar {
+  width: 52px; height: 52px; border-radius: var(--r-full);
+  display: grid; place-items: center;
+  background: var(--sand); color: var(--wine);
+  font-family: var(--font-display); font-weight: 700; font-size: 1.4rem;
+}
+.profile-head h1 { font-size: var(--t-h2); }
+
+.profile-tabs {
+  display: flex; gap: var(--s2); overflow-x: auto; scrollbar-width: none;
+  margin-block-end: var(--s4);
+}
+.profile-tabs::-webkit-scrollbar { display: none; }
+.profile-tabs button {
+  display: inline-flex; align-items: center; gap: 6px; flex: none;
+  min-height: 40px; padding-inline: var(--s4);
+  border-radius: var(--r-full); border: 1px solid var(--line-strong);
+  background: var(--surface); font-size: var(--t-sm); color: var(--ink-70);
+}
+.profile-tabs button.on { background: var(--ink); border-color: var(--ink); color: var(--paper); }
+
+.address-list { list-style: none; padding: 0; display: grid; gap: var(--s3); }
+.address-list li {
+  padding: var(--s4); border-radius: var(--r-md);
+  border: 1px solid var(--line); background: var(--paper);
+  font-size: var(--t-sm);
+}
+.address-list li.on { border-color: var(--wine); }
+.address-top { display: flex; align-items: center; justify-content: space-between; gap: var(--s3); margin-block-end: var(--s2); }
+.address-top b { font-family: var(--font-display); font-size: 1rem; }
+.address-actions { display: flex; gap: var(--s3); margin-block-start: var(--s3); }
+.btn-quiet.danger { color: var(--danger); display: inline-flex; align-items: center; gap: 4px; }
+.address-form { display: grid; gap: var(--s3); }
+.address-form .two { display: grid; gap: var(--s3); }
+
+.notify-list { list-style: none; padding: 0; display: grid; gap: var(--s3); }
+.notify-list li { display: flex; align-items: center; justify-content: space-between; gap: var(--s4); }
+.notify-list b { display: block; font-size: var(--t-sm); }
+.notify-list small { font-size: var(--t-xs); color: var(--ink-45); }
+.notify-state { font-size: var(--t-xs); color: var(--ink-45); }
+
+.switch { position: relative; flex: none; width: 46px; height: 28px; }
+.switch input { position: absolute; opacity: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+.switch i {
+  position: absolute; inset: 0; border-radius: var(--r-full);
+  background: var(--line-strong); transition: background 0.2s var(--ease);
+  pointer-events: none;
+}
+.switch i::after {
+  content: ''; position: absolute; inset-block-start: 3px; inset-inline-start: 3px;
+  width: 22px; height: 22px; border-radius: var(--r-full);
+  background: #fff; transition: transform 0.2s var(--ease);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+.switch input:checked + i { background: var(--wine); }
+/* RTL: "on" travels toward the inline end, which is the left. */
+.switch input:checked + i::after { transform: translateX(-18px); }
+.switch input:focus-visible + i { box-shadow: 0 0 0 3px var(--wine-soft); }
+
+.my-reviews { list-style: none; padding: 0; display: grid; gap: var(--s4); }
+.my-reviews li { padding-block-end: var(--s3); border-block-end: 1px solid var(--line); }
+.my-reviews p { font-size: var(--t-sm); color: var(--ink-70); margin-block: var(--s2); }
+.my-stars { display: inline-flex; color: #f0a92b; }
+
+/* ── Writing a review ── */
+.review-cta {
+  display: grid; gap: var(--s3); justify-items: start;
+  padding: var(--s4); margin-block-start: var(--s4);
+  border: 1px dashed var(--line-strong); border-radius: var(--r-md);
+}
+.review-cta p { font-size: var(--t-sm); color: var(--ink-70); }
+.review-form {
+  display: grid; gap: var(--s3);
+  padding: var(--s4); margin-block-start: var(--s4);
+  border: 1px solid var(--line); border-radius: var(--r-md);
+  background: var(--surface);
+}
+.rate-row { display: flex; gap: var(--s2); }
+.rate-row button {
+  width: var(--tap); height: var(--tap); border-radius: var(--r-sm);
+  display: grid; place-items: center;
+  transition: transform 0.15s var(--ease);
+}
+.rate-row button:active { transform: scale(0.9); }
+.rate-row .star { width: 26px; height: 26px; }
+
+@media (min-width: 700px) {
+  .auth-card { grid-template-columns: 1fr 1fr; }
+  .auth-art { border-block-end: 0; border-inline-end: 1px solid var(--line); align-content: center; }
+  .auth-form { padding: var(--s6) var(--s5); align-self: center; width: 100%; }
+  .address-form .two { grid-template-columns: 1fr 1fr; }
+  .address-list { grid-template-columns: 1fr 1fr; }
+}
+
 /* ── Reviews ───────────────────────────────────────────────
    Every number here is computed from the entries in data/reviews.js, so the
    average, the bars and the count cannot drift apart from the text below.
